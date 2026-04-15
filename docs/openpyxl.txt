@@ -1,0 +1,193 @@
+========================================
+БИБЛИОТЕКА: openpyxl
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://openpyxl.readthedocs.io/
+РЕПОЗИТОРИЙ: https://foss.heptapod.net/openpyxl/openpyxl
+
+ОПИСАНИЕ:
+Библиотека для чтения и записи файлов Excel (форматы .xlsx, .xlsm, .xltx, .xltm).
+Не требует установки Microsoft Excel. Поддерживает формулы, стили, графики и т.д.
+
+ОСНОВНЫЕ КЛАССЫ:
+- Workbook: Рабочая книга (файл Excel)
+- Worksheet: Рабочий лист
+- Cell: Ячейка
+- Chart: Диаграмма
+- Style: Стили форматирования
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- openpyxl.load_workbook(filename) - Загрузить существующую книгу
+- openpyxl.Workbook() - Создать новую книгу
+- workbook.save(filename) - Сохранить книгу
+- workbook.active - Активный лист
+- workbook.create_sheet(title, index) - Создать лист
+- workbook.remove_sheet(sheet) - Удалить лист
+- workbook.sheetnames - Список имен листов
+
+РАБОТА С ЛИСТАМИ:
+- sheet.title - Имя листа
+- sheet.cell(row, column, value) - Доступ к ячейке
+- sheet[row][column] - Доступ к ячейке
+- sheet['A1'] - Доступ к ячейке по координатам
+- sheet.append(row_data) - Добавить строку в конец
+- sheet.insert_rows(idx, amount) - Вставить строки
+- sheet.delete_rows(idx, amount) - Удалить строки
+- sheet.insert_cols(idx, amount) - Вставить столбцы
+- sheet.delete_cols(idx, amount) - Удалить столбцы
+- sheet.max_row - Максимальный номер строки с данными
+- sheet.max_column - Максимальный номер столбца с данными
+- sheet.iter_rows(min_row, max_row, min_col, max_col) - Итератор по строкам
+- sheet.iter_cols(min_row, max_row, min_col, max_col) - Итератор по столбцам
+
+РАБОТА С ЯЧЕЙКАМИ:
+- cell.value - Значение ячейки
+- cell.value = value - Установить значение
+- cell.data_type - Тип данных
+- cell.font - Шрифт
+- cell.border - Границы
+- cell.fill - Заливка
+- cell.number_format - Формат числа
+- cell.alignment - Выравнивание
+- cell.comment - Комментарий
+
+СТИЛИ:
+- Font(name, size, bold, italic, color) - Шрифт
+- PatternFill(start_color, end_color, fill_type) - Заливка
+- Border(left, right, top, bottom) - Границы
+- Side(style, color) - Сторона границы
+- Alignment(horizontal, vertical, wrap_text) - Выравнивание
+- NamedStyle - Именованный стиль
+
+ФОРМУЛЫ:
+- cell.value = "=SUM(A1:A10)" - Формула
+- cell.value = "=IF(A1>10, 'Yes', 'No')" - Условная формула
+
+ДИАГРАММЫ:
+from openpyxl.chart import BarChart, LineChart, PieChart, Reference
+- chart = BarChart() - Создать диаграмму
+- data = Reference(sheet, min_col, min_row, max_col, max_row) - Ссылка на данные
+- chart.add_data(data, titles_from_data) - Добавить данные
+- sheet.add_chart(chart, cell) - Добавить диаграмму на лист
+
+УСТАНОВКА:
+pip install openpyxl
+
+ПРИМЕР КОДА:
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.chart import BarChart, Reference
+
+# СОЗДАНИЕ НОВОГО ФАЙЛА
+wb = Workbook()
+
+# Работа с активным листом
+ws = wb.active
+ws.title = "Данные"
+
+# Запись данных
+ws['A1'] = "Имя"
+ws['B1'] = "Возраст"
+ws['C1'] = "Город"
+ws['D1'] = "Зарплата"
+
+# Заполнение данных
+data = [
+    ("Иван", 25, "Москва", 50000),
+    ("Мария", 30, "СПб", 60000),
+    ("Петр", 28, "Новосибирск", 55000),
+    ("Анна", 35, "Москва", 70000),
+    ("Сергей", 26, "СПб", 48000)
+]
+
+for row_idx, row_data in enumerate(data, start=2):
+    for col_idx, value in enumerate(row_data, start=1):
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+# Стилизация заголовков
+header_font = Font(bold=True, color="FFFFFF")
+header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+header_alignment = Alignment(horizontal="center", vertical="center")
+
+for cell in ws[1]:
+    cell.font = header_font
+    cell.fill = header_fill
+    cell.alignment = header_alignment
+
+# Формулы
+ws['E1'] = "Бонус"
+for row in range(2, len(data) + 2):
+    ws[f'E{row}'] = f"=D{row}*0.1"
+
+ws['F1'] = "Итого"
+for row in range(2, len(data) + 2):
+    ws[f'F{row}'] = f"=D{row}+E{row}"
+
+# Добавление итоговой строки
+last_row = len(data) + 2
+ws[f'A{last_row}'] = "ИТОГО:"
+ws[f'D{last_row}'] = f"=SUM(D2:D{last_row-1})"
+ws[f'E{last_row}'] = f"=SUM(E2:E{last_row-1})"
+ws[f'F{last_row}'] = f"=SUM(F2:F{last_row-1})"
+
+# Выравнивание для итоговой строки
+for cell in ws[last_row]:
+    cell.font = Font(bold=True)
+    cell.alignment = Alignment(horizontal="center")
+
+# Автоматическая ширина столбцов
+for column in ws.columns:
+    max_length = 0
+    column_letter = column[0].column_letter
+    for cell in column:
+        try:
+            if len(str(cell.value)) > max_length:
+                max_length = len(str(cell.value))
+        except:
+            pass
+    adjusted_width = min(max_length + 2, 30)
+    ws.column_dimensions[column_letter].width = adjusted_width
+
+# ДОБАВЛЕНИЕ ДИАГРАММЫ
+chart = BarChart()
+chart.title = "Зарплата по сотрудникам"
+chart.x_axis.title = "Сотрудники"
+chart.y_axis.title = "Зарплата (руб)"
+
+data = Reference(ws, min_col=4, min_row=1, max_row=last_row-1, max_col=4)
+categories = Reference(ws, min_col=1, min_row=2, max_row=last_row-1)
+chart.add_data(data, titles_from_data=True)
+chart.set_categories(categories)
+
+ws.add_chart(chart, "H2")
+
+# СОЗДАНИЕ НОВОГО ЛИСТА
+ws_summary = wb.create_sheet("Сводка")
+ws_summary['A1'] = "Статистика"
+ws_summary['A2'] = "Средняя зарплата"
+ws_summary['B2'] = f"=AVERAGE(Данные!D2:D{last_row-1})"
+ws_summary['A3'] = "Макс зарплата"
+ws_summary['B3'] = f"=MAX(Данные!D2:D{last_row-1})"
+ws_summary['A4'] = "Мин зарплата"
+ws_summary['B4'] = f"=MIN(Данные!D2:D{last_row-1})"
+
+# СОХРАНЕНИЕ
+wb.save('example.xlsx')
+print("Файл example.xlsx создан")
+
+# ЧТЕНИЕ СУЩЕСТВУЮЩЕГО ФАЙЛА
+wb_read = load_workbook('example.xlsx', data_only=True)
+ws_read = wb_read.active
+
+print(f"\nЧтение файла: {ws_read.title}")
+for row in ws_read.iter_rows(min_row=1, max_row=5, values_only=True):
+    print(row)
+
+# ПОЛУЧЕНИЕ ЗНАЧЕНИЙ С ФОРМУЛАМИ (data_only=True)
+print(f"\nЗначения с формулами:")
+for row in range(2, len(data) + 2):
+    name = ws_read[f'A{row}'].value
+    total = ws_read[f'F{row}'].value
+    print(f"{name}: {total} руб")

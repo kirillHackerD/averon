@@ -1,0 +1,236 @@
+========================================
+БИБЛИОТЕКА: Faker
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://faker.readthedocs.io/
+РЕПОЗИТОРИЙ: https://github.com/joke2k/faker
+
+ОПИСАНИЕ:
+Библиотека для генерации поддельных (фейковых) данных.
+Позволяет создавать реалистичные имена, адреса, email, номера телефонов,
+даты, текст и другие данные для тестирования, заполнения баз данных и т.д.
+
+ОСНОВНЫЕ КЛАССЫ:
+- Faker: Основной класс генератора
+- Generator: Генератор данных
+- Provider: Провайдер данных (можно создавать свои)
+
+ОСНОВНЫЕ МЕТОДЫ:
+- faker.name() - Полное имя
+- faker.first_name() - Имя
+- faker.last_name() - Фамилия
+- faker.email() - Email адрес
+- faker.password() - Пароль
+- faker.phone_number() - Номер телефона
+- faker.address() - Адрес
+- faker.city() - Город
+- faker.country() - Страна
+- faker.postcode() - Почтовый индекс
+- faker.date() - Дата
+- faker.date_time() - Дата и время
+- faker.year() - Год
+- faker.month() - Месяц
+- faker.day_of_week() - День недели
+- faker.text() - Текст
+- faker.sentence() - Предложение
+- faker.paragraph() - Параграф
+- faker.word() - Слово
+- faker.words() - Список слов
+- faker.uuid4() - UUID
+- faker.url() - URL
+- faker.domain_name() - Имя домена
+- faker.ipv4() - IPv4 адрес
+- faker.ipv6() - IPv6 адрес
+- faker.mac_address() - MAC адрес
+- faker.user_name() - Имя пользователя
+- faker.company() - Название компании
+- faker.job() - Профессия
+- faker.credit_card_number() - Номер кредитной карты
+- faker.credit_card_provider() - Провайдер кредитной карты
+- faker.currency() - Валюта
+- faker.color_name() - Название цвета
+- faker.hex_color() - HEX цвет
+- faker.rgb_color() - RGB цвет
+- faker.language_name() - Язык
+- faker.file_extension() - Расширение файла
+- faker.file_name() - Имя файла
+- faker.mime_type() - MIME тип
+- faker.md5() - MD5 хеш
+- faker.sha1() - SHA1 хеш
+- faker.sha256() - SHA256 хеш
+- faker.json() - JSON данные
+- faker.xml() - XML данные
+- faker.csv() - CSV данные
+- faker.image_url() - URL изображения
+- faker.lorem() - Lorem ipsum текст
+
+ЛОКАЛИЗАЦИЯ:
+- faker = Faker('ru_RU') - Русская локализация
+- faker = Faker('en_US') - Американский английский
+- faker = Faker('en_GB') - Британский английский
+- faker = Faker('fr_FR') - Французский
+- faker = Faker('de_DE') - Немецкий
+- faker = Faker('zh_CN') - Китайский
+- faker = Faker('ja_JP') - Японский
+
+ДОСТУПНЫЕ ЛОКАЛИ:
+ru_RU, en_US, en_GB, en_CA, fr_FR, de_DE, it_IT, es_ES, pt_BR, zh_CN,
+ja_JP, ko_KR, ar_SA, hi_IN, tr_TR, pl_PL, nl_NL, sv_SE, da_DK, fi_FI,
+no_NO, cs_CZ, sk_SK, hu_HU, ro_RO, bg_BG, uk_UA, el_GR, he_IL, th_TH
+
+УСТАНОВКА:
+pip install Faker
+
+ПРИМЕР КОДА:
+from faker import Faker
+import pandas as pd
+
+# СОЗДАНИЕ ГЕНЕРАТОРА
+fake = Faker()  # Английская локализация
+fake_ru = Faker('ru_RU')  # Русская локализация
+fake_uk = Faker('uk_UA')  # Украинская локализация
+
+print("=== РУССКАЯ ЛОКАЛИЗАЦИЯ ===")
+print(f"Имя: {fake_ru.name()}")
+print(f"Адрес: {fake_ru.address()}")
+print(f"Телефон: {fake_ru.phone_number()}")
+print(f"Email: {fake_ru.email()}")
+print(f"Компания: {fake_ru.company()}")
+print(f"Профессия: {fake_ru.job()}")
+print(f"Текст: {fake_ru.text()[:100]}...")
+
+print("\n=== АНГЛИЙСКАЯ ЛОКАЛИЗАЦИЯ ===")
+print(f"Name: {fake.name()}")
+print(f"Address: {fake.address()}")
+print(f"Phone: {fake.phone_number()}")
+print(f"Email: {fake.email()}")
+print(f"Company: {fake.company()}")
+print(f"Job: {fake.job()}")
+
+# ГЕНЕРАЦИЯ РАЗЛИЧНЫХ ДАННЫХ
+print("\n=== РАЗЛИЧНЫЕ ДАННЫЕ ===")
+print(f"UUID: {fake.uuid4()}")
+print(f"URL: {fake.url()}")
+print(f"IP: {fake.ipv4()}")
+print(f"MAC: {fake.mac_address()}")
+print(f"Username: {fake.user_name()}")
+print(f"Password: {fake.password()}")
+print(f"Credit Card: {fake.credit_card_number()}")
+print(f"Currency: {fake.currency()}")
+print(f"Color: {fake.color_name()}, HEX: {fake.hex_color()}")
+print(f"File: {fake.file_name()}")
+
+# ДАТЫ
+print("\n=== ДАТЫ ===")
+print(f"Дата: {fake.date()}")
+print(f"Дата и время: {fake.date_time()}")
+print(f"Год: {fake.year()}")
+print(f"Месяц: {fake.month()}")
+print(f"День недели: {fake.day_of_week()}")
+
+# ТЕКСТ
+print("\n=== ТЕКСТ ===")
+print(f"Слово: {fake.word()}")
+print(f"Слова: {fake.words(5)}")
+print(f"Предложение: {fake.sentence()}")
+print(f"Параграф: {fake.paragraph()}")
+print(f"Текст: {fake.text()[:200]}...")
+
+# ГЕНЕРАЦИЯ МАССИВА ДАННЫХ
+print("\n=== ГЕНЕРАЦИЯ 10 ПОЛЬЗОВАТЕЛЕЙ ===")
+users = []
+for _ in range(10):
+    user = {
+        'id': fake.uuid4(),
+        'first_name': fake_ru.first_name(),
+        'last_name': fake_ru.last_name(),
+        'email': fake.email(),
+        'phone': fake_ru.phone_number(),
+        'address': fake_ru.address(),
+        'city': fake_ru.city(),
+        'postcode': fake_ru.postcode(),
+        'birth_date': fake.date_of_birth(minimum_age=18, maximum_age=80),
+        'job': fake_ru.job(),
+        'company': fake_ru.company(),
+        'salary': fake.random_int(min=30000, max=150000),
+        'is_active': fake.boolean(chance_of_getting_true=80),
+        'registered_at': fake.date_time_this_year()
+    }
+    users.append(user)
+
+# Создание DataFrame
+df = pd.DataFrame(users)
+print(df.head())
+
+# СОХРАНЕНИЕ В CSV
+df.to_csv('fake_users.csv', index=False, encoding='utf-8')
+print("\nДанные сохранены в fake_users.csv")
+
+# КАСТОМНЫЙ ПРОВАЙДЕР
+from faker.providers import BaseProvider
+
+class CustomProvider(BaseProvider):
+    def my_own_data(self):
+        return "Собственные данные"
+
+# Регистрация кастомного провайдера
+fake.add_provider(CustomProvider)
+print(f"Кастомные данные: {fake.my_own_data()}")
+
+# ГЕНЕРАЦИЯ С УНИКАЛЬНЫМИ ЗНАЧЕНИЯМИ
+print("\n=== УНИКАЛЬНЫЕ ЗНАЧЕНИЯ ===")
+unique_emails = [fake.unique.email() for _ in range(5)]
+print(f"Уникальные email: {unique_emails}")
+
+# СБРОС УНИКАЛЬНОСТИ
+fake.unique.clear()
+
+# ГЕНЕРАЦИЯ СЕРИАЛИЗОВАННЫХ ДАННЫХ
+print("\n=== JSON ===")
+print(fake.json(num_rows=3, indent=2))
+
+# ГЕНЕРАЦИЯ ПРОФИЛЯ
+print("\n=== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ===")
+profile = fake.simple_profile()
+print(profile)
+
+# ПОЛНЫЙ ПРОФИЛЬ
+full_profile = fake.profile()
+print(f"Имя: {full_profile['name']}")
+print(f"Пол: {full_profile['sex']}")
+print(f"Адрес: {full_profile['address']}")
+print(f"Работа: {full_profile['job']}")
+
+# ГЕНЕРАЦИЯ ВАЛЮТ
+print("\n=== ВАЛЮТЫ ===")
+for _ in range(5):
+    currency = fake.currency()
+    print(f"{currency[0]}: {currency[1]}")
+
+# ГЕНЕРАЦИЯ ДАННЫХ ДЛЯ БАЗЫ ДАННЫХ
+def generate_customers(n):
+    customers = []
+    for _ in range(n):
+        customer = {
+            'customer_id': fake.unique.random_number(digits=8),
+            'first_name': fake_ru.first_name(),
+            'last_name': fake_ru.last_name(),
+            'email': fake.email(),
+            'phone': fake_ru.phone_number(),
+            'address': fake_ru.street_address(),
+            'city': fake_ru.city(),
+            'country': fake_ru.country(),
+            'postal_code': fake_ru.postcode(),
+            'registration_date': fake.date_between(start_date='-5y', end_date='today'),
+            'last_login': fake.date_time_this_month(),
+            'status': fake.random_element(elements=('active', 'inactive', 'banned')),
+            'total_spent': fake.pyfloat(min_value=0, max_value=10000, right_digits=2)
+        }
+        customers.append(customer)
+    return customers
+
+customers = generate_customers(5)
+for customer in customers:
+    print(f"{customer['first_name']} {customer['last_name']} - {customer['email']}")

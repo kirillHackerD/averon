@@ -1,0 +1,193 @@
+Pathlib Module Documentation
+
+Object-oriented filesystem paths. Modern replacement for os.path. Built-in Python library.
+
+Basic Usage:
+from pathlib import Path
+
+# Create path object
+current_dir = Path('.')
+home_dir = Path.home()
+desktop = Path.home() / 'Desktop'
+
+# Join paths
+data_file = Path('folder') / 'subfolder' / 'file.txt'
+# Or
+data_file = Path('folder', 'subfolder', 'file.txt')
+
+# Absolute path
+abs_path = data_file.resolve()
+print(abs_path)
+
+File Operations:
+from pathlib import Path
+
+# Check if exists
+path = Path('file.txt')
+if path.exists():
+    print("File exists")
+
+# Check if file or directory
+if path.is_file():
+    print("It's a file")
+if path.is_dir():
+    print("It's a directory")
+
+# Get file info
+print(path.stat().st_size)  # File size
+print(path.stat().st_mtime)  # Modification time
+
+# Create new file
+new_file = Path('new_file.txt')
+new_file.touch()  # Create empty file
+
+# Create directory
+new_dir = Path('new_folder')
+new_dir.mkdir()  # Create single directory
+new_dir.mkdir(parents=True, exist_ok=True)  # Create with parents
+
+Reading and Writing:
+from pathlib import Path
+
+# Write text
+path = Path('file.txt')
+path.write_text('Hello World', encoding='utf-8')
+
+# Read text
+content = path.read_text(encoding='utf-8')
+print(content)
+
+# Write binary
+path.write_bytes(b'Binary data')
+
+# Read binary
+data = path.read_bytes()
+
+# Open file
+with path.open('r', encoding='utf-8') as f:
+    for line in f:
+        print(line.strip())
+
+Path Components:
+from pathlib import Path
+
+path = Path('/home/user/documents/file.txt')
+
+print(path.name)        # file.txt (filename with extension)
+print(path.stem)        # file (filename without extension)
+print(path.suffix)      # .txt (file extension)
+print(path.suffixes)    # List of extensions
+print(path.parent)      # /home/user/documents (parent directory)
+print(path.parents[0])  # /home/user/documents
+print(path.parents[1])  # /home/user
+print(path.anchor)      # / (root)
+print(path.parts)       # ('/', 'home', 'user', 'documents', 'file.txt')
+
+Iterating Directories:
+from pathlib import Path
+
+# List all files in directory
+for item in Path('.').iterdir():
+    print(item)
+
+# List only files
+for file in Path('.').glob('*'):
+    if file.is_file():
+        print(file)
+
+# Recursive search (all .txt files)
+for txt_file in Path('.').rglob('*.txt'):
+    print(txt_file)
+
+# Pattern matching
+for py_file in Path('.').glob('*.py'):
+    print(py_file)
+
+# Find specific file
+data_file = list(Path('.').glob('**/data.json'))
+
+Path Manipulation:
+from pathlib import Path
+
+path = Path('folder/file.txt')
+
+# Change extension
+new_path = path.with_suffix('.csv')
+print(new_path)  # folder/file.csv
+
+# Change name
+new_path = path.with_name('new_file.txt')
+print(new_path)  # folder/new_file.txt
+
+# Join with new path
+full_path = path / 'subdir' / 'document.pdf'
+
+# Relative path
+current = Path('/home/user')
+target = Path('/home/user/docs/file.txt')
+relative = target.relative_to(current)
+print(relative)  # docs/file.txt
+
+File Operations:
+from pathlib import Path
+
+source = Path('source.txt')
+destination = Path('destination.txt')
+
+# Copy (using shutil)
+import shutil
+shutil.copy(source, destination)
+
+# Move/Rename
+source.rename(destination)
+
+# Delete file
+try:
+    source.unlink()  # Remove file
+except FileNotFoundError:
+    pass
+
+# Delete directory
+Path('empty_folder').rmdir()  # Only empty directories
+import shutil
+shutil.rmtree('folder')  # Remove with contents
+
+Working with Extensions:
+from pathlib import Path
+
+# Find all Python files
+for py_file in Path('.').rglob('*.py'):
+    print(py_file)
+
+# Find all image files
+extensions = {'.jpg', '.jpeg', '.png', '.gif'}
+for img_file in Path('.').rglob('*'):
+    if img_file.suffix.lower() in extensions:
+        print(img_file)
+
+# Batch rename
+for file in Path('.').glob('*.txt'):
+    new_name = file.stem + '.md'
+    file.rename(file.with_name(new_name))
+
+Path Comparison:
+from pathlib import Path
+
+path1 = Path('folder/file.txt')
+path2 = Path('folder/./file.txt')
+
+# Check if same file
+print(path1.resolve() == path2.resolve())  # True
+
+# Check if in directory
+print(Path('file.txt') in Path('.').iterdir())
+
+Best Practices:
+- Use pathlib instead of os.path for new code
+- Use / operator for path joining
+- Use resolve() for absolute paths
+- Use rglob() for recursive searches
+- Handle FileNotFoundError when deleting
+- Use with_name() and with_suffix() for modifications
+- Always specify encoding in read/write operations
+- Use Path.home() and Path.cwd() for standard directories

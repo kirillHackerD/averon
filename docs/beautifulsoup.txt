@@ -1,0 +1,195 @@
+BeautifulSoup Documentation
+
+BeautifulSoup is a Python library for pulling data out of HTML and XML files.
+
+Installation:
+pip install beautifulsoup4
+pip install lxml  # Recommended parser
+
+Basic Usage:
+from bs4 import BeautifulSoup
+
+# Parse HTML
+html_doc = """
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title"><b>The Dormouse's story</b></p>
+<p class="story">Once upon a time there were three little sisters...</p>
+<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a>
+</body></html>
+"""
+
+soup = BeautifulSoup(html_doc, 'html.parser')
+# Or with lxml parser: soup = BeautifulSoup(html_doc, 'lxml')
+
+Navigation:
+# Get title
+soup.title
+# <title>The Dormouse's story</title>
+
+# Get title string
+soup.title.string
+# 'The Dormouse's story'
+
+# Get first p tag
+soup.p
+# <p class="title"><b>The Dormouse's story</b></p>
+
+# Get all p tags
+soup.find_all('p')
+
+# Get specific tag by attributes
+soup.find('p', class_='title')
+soup.find('a', id='link1')
+
+Searching:
+# Find all links
+soup.find_all('a')
+
+# Find by class
+soup.find_all(class_='sister')
+
+# Find by text
+soup.find_all(string='Elsie')
+
+# Regular expressions
+import re
+soup.find_all('a', href=re.compile(r'example'))
+
+# CSS Selectors
+soup.select('title')
+soup.select('p #link1')
+soup.select('.sister')
+soup.select('a[href*="example"]')
+
+Getting Attributes:
+# Get href attribute
+link = soup.find('a')
+link['href']
+
+# Get all attributes
+link.attrs
+
+# Check if attribute exists
+'href' in link.attrs
+
+Modifying the Tree:
+# Change tag name
+soup.title.name = 'h1'
+
+# Change attributes
+tag = soup.find('a')
+tag['href'] = 'http://newurl.com'
+
+# Add new attribute
+tag['class'] = 'new-class'
+
+# Remove tag
+tag.decompose()
+
+# Replace tag
+tag.replace_with('New text')
+
+Adding Content:
+# Append to tag
+soup.body.append('New content')
+
+# Insert at specific position
+soup.body.insert(0, 'First content')
+
+# Create new tag
+new_tag = soup.new_tag('div', class_='new-div')
+new_tag.string = 'New div content'
+soup.body.append(new_tag)
+
+Output:
+# Get HTML as string
+str(soup)
+soup.prettify()
+
+# Write to file
+with open('output.html', 'w') as f:
+    f.write(str(soup))
+
+Working with Real Pages:
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://example.com'
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Extract all links
+links = []
+for link in soup.find_all('a'):
+    href = link.get('href')
+    text = link.get_text()
+    links.append({'href': href, 'text': text})
+
+# Extract text from all paragraphs
+text_content = []
+for p in soup.find_all('p'):
+    text_content.append(p.get_text())
+
+Common Patterns:
+# Extract all text
+soup.get_text()
+
+# Extract text with separator
+soup.get_text(separator=' | ')
+
+# Strip whitespace
+text = soup.get_text(strip=True)
+
+# Find parent
+link = soup.find('a')
+parent = link.parent
+
+# Find next sibling
+next_sibling = link.next_sibling
+
+# Find all siblings
+siblings = link.find_next_siblings()
+
+Error Handling:
+# Handle missing tags
+title = soup.title.string if soup.title else 'No title'
+
+# Safe attribute access
+href = link.get('href', '')  # Returns '' if no href
+
+# Check if tag exists
+if soup.find('div', class_='content'):
+    content = soup.find('div', class_='content')
+
+XML Parsing:
+# Parse XML
+xml = '<root><item id="1">First item</item><item id="2">Second item</item></root>'
+soup = BeautifulSoup(xml, 'xml')
+
+# Find elements
+items = soup.find_all('item')
+for item in items:
+    print(item['id'], item.text)
+
+Advanced Searching:
+# Limit results
+soup.find_all('a', limit=5)
+
+# Recursive search
+soup.find_all('a', recursive=False)
+
+# Multiple attributes
+soup.find_all('a', class_='external', href=re.compile(r'http'))
+
+# Lambda function
+soup.find_all(lambda tag: tag.name == 'a' and 'external' in tag.get('class', []))
+
+Best Practices:
+- Use lxml parser for better performance
+- Use specific selectors when possible
+- Handle missing elements gracefully
+- Use get() method for safe attribute access
+- Consider using CSS selectors for complex queries
+- Be mindful of website terms of service

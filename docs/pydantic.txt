@@ -1,0 +1,163 @@
+Pydantic Library Documentation
+
+Data validation and settings management using Python type hints.
+
+Installation:
+pip install pydantic
+
+Basic Model:
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    age: int = 0  # Default value
+
+# Create instance
+user = User(id=1, name='John', email='john@example.com')
+
+# Access fields
+print(user.name)  # John
+print(user.dict())  # {'id': 1, 'name': 'John', ...}
+
+# Automatic validation
+try:
+    user = User(id='not_a_number', name='John', email='john@example.com')
+except ValueError as e:
+    print(e)  # id is not a valid integer
+
+Field Types:
+from pydantic import BaseModel, Field
+from typing import Optional, List
+
+class Product(BaseModel):
+    id: int
+    name: str
+    price: float = Field(gt=0, description='Price must be positive')
+    tags: List[str] = []
+    description: Optional[str] = None
+
+product = Product(id=1, name='Laptop', price=999.99, tags=['electronics'])
+
+Validation Constraints:
+from pydantic import BaseModel, Field, validator
+
+class Person(BaseModel):
+    name: str = Field(..., min_length=2, max_length=50)
+    age: int = Field(..., ge=0, le=150)  # Greater/equal 0, less/equal 150
+    email: str = Field(..., regex=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
+    
+    @validator('name')
+    def name_must_be_capitalized(cls, v):
+        if not v[0].isupper():
+            raise ValueError('Name must start with capital letter')
+        return v
+
+# Custom validator
+class User(BaseModel):
+    password: str
+    password_confirm: str
+    
+    @validator('password_confirm')
+    def passwords_match(cls, v, values):
+        if 'password' in values and v != values['password']:
+            raise ValueError('Passwords do not match')
+        return v
+
+Nested Models:
+from pydantic import BaseModel
+from typing import List
+
+class Address(BaseModel):
+    street: str
+    city: str
+    zip_code: str
+
+class Person(BaseModel):
+    name: str
+    addresses: List[Address]
+
+person = Person(
+    name='John',
+    addresses=[
+        Address(street='123 Main St', city='NYC', zip_code='10001'),
+        Address(street='456 Oak Ave', city='LA', zip_code='90001')
+    ]
+)
+
+Parsing Data:
+import json
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+
+# From dict
+data = {'id': 1, 'name': 'John'}
+user = User(**data)
+
+# From JSON
+json_str = '{"id": 1, "name": "John"}'
+user = User.parse_raw(json_str)
+
+# From JSON file
+user = User.parse_file('user.json')
+
+Exporting Data:
+user = User(id=1, name='John')
+
+# To dict
+user_dict = user.dict()
+
+# To JSON
+user_json = user.json()
+
+# Exclude fields
+user_dict = user.dict(exclude={'id'})
+
+# Include only specific fields
+user_dict = user.dict(include={'name'})
+
+Config Options:
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+    
+    class Config:
+        extra = 'forbid'  # 'allow', 'ignore', or 'forbid'
+        anystr_strip_whitespace = True
+        use_enum_values = True
+
+Optional Fields:
+from typing import Optional
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+Error Handling:
+from pydantic import BaseModel, ValidationError
+
+class User(BaseModel):
+    id: int
+    name: str
+
+try:
+    user = User(id='abc', name=123)
+except ValidationError as e:
+    print(e.json())
+    for error in e.errors():
+        print(f"Field: {error['loc']}, Error: {error['msg']}")
+
+Best Practices:
+- Use type hints for all fields
+- Set appropriate default values
+- Use Field() for validation constraints
+- Create custom validators for complex logic
+- Use Config.extra = 'forbid' to catch typos
+- Parse external data instead of manual validation

@@ -1,0 +1,131 @@
+React Documentation
+
+React is a JavaScript library for building user interfaces.
+
+Basic Usage:
+import React from 'react';
+
+function App() {
+    return <div>Hello World</div>;
+}
+
+export default App;
+
+Components:
+// Functional component
+function Welcome(props) {
+    return <h1>Hello, {props.name}</h1>;
+}
+
+// Class component
+class Welcome extends React.Component {
+    render() {
+        return <h1>Hello, {this.props.name}</h1>;
+    }
+}
+
+Hooks:
+useState:
+const [count, setCount] = React.useState(0);
+
+useEffect:
+React.useEffect(() => {
+    // Side effect here
+    return () => {
+        // Cleanup
+    };
+}, [dependencies]);
+
+useContext:
+const value = React.useContext(MyContext);
+
+Props:
+function Welcome({ name, age }) {
+    return (
+        <div>
+            <h1>{name}</h1>
+            <p>Age: {age}</p>
+        </div>
+    );
+}
+
+State Management:
+// useState hook
+const [user, setUser] = useState({ name: 'John', age: 30 });
+
+// Update state
+setUser(prevUser => ({ ...prevUser, age: 31 }));
+
+Events:
+function Button() {
+    const handleClick = (e) => {
+        console.log('Button clicked');
+    };
+    
+    return <button onClick={handleClick}>Click me</button>;
+}
+
+Conditional Rendering:
+function Greeting({ isLoggedIn }) {
+    if (isLoggedIn) {
+        return <h1>Welcome back!</h1>;
+    }
+    return <h1>Please sign in.</h1>;
+}
+
+// Ternary operator
+return isLoggedIn ? <h1>Welcome back!</h1> : <h1>Please sign in.</h1>;
+
+Lists and Keys:
+function NumberList({ numbers }) {
+    return (
+        <ul>
+            {numbers.map((number) => (
+                <li key={number.toString()}>
+                    {number}
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+Forms:
+function NameForm() {
+    const [name, setName] = useState('');
+    
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        alert('Submitted: ' + name);
+    };
+    
+    return (
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+            <button type="submit">Submit</button>
+        </form>
+    );
+}
+
+Lifecycle:
+useEffect(() => {
+    // Component did mount
+    console.log('Component mounted');
+    
+    return () => {
+        // Component will unmount
+        console.log('Component will unmount');
+    };
+}, []);
+
+Best Practices:
+- Use functional components with hooks
+- Keep components small and focused
+- Use props for data flow
+- Use state for component-specific data
+- Use keys for list items
+- Avoid inline functions in render
+- Use useMemo/useCallback for performance

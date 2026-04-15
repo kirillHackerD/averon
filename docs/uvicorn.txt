@@ -1,0 +1,106 @@
+========================================
+БИБЛИОТЕКА: uvicorn
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://www.uvicorn.org/
+РЕПОЗИТОРИЙ: https://github.com/encode/uvicorn
+
+ОПИСАНИЕ:
+Молниеносный ASGI (Asynchronous Server Gateway Interface) сервер для Python.
+Используется для запуска асинхронных веб-приложений (FastAPI, Starlette, Django ASGI).
+Основан на uvloop и httptools для максимальной производительности.
+
+ОСНОВНЫЕ ОСОБЕННОСТИ:
+- Высокая производительность (использует uvloop)
+- Поддержка HTTP/1.1 и WebSockets
+- Поддержка HTTP/2 (с h11)
+- Автоматическая перезагрузка при изменениях кода (--reload)
+- Поддержка SSL/HTTPS
+- Поддержка нескольких рабочих процессов (workers)
+- Логирование запросов
+- Совместимость с ASGI спецификацией
+
+ОСНОВНЫЕ ПАРАМЕТРЫ ЗАПУСКА:
+- uvicorn main:app - Запуск приложения (module:instance)
+- --host HOST - Хост для привязки (по умолчанию 127.0.0.1)
+- --port PORT - Порт для привязки (по умолчанию 8000)
+- --reload - Автоматическая перезагрузка при изменениях
+- --reload-dir PATH - Директории для отслеживания изменений
+- --workers N - Количество рабочих процессов
+- --loop LOOP - Тип event loop (auto, asyncio, uvloop)
+- --http HTTP - HTTP реализация (auto, h11, httptools)
+- --ws WEBSOCKET - WebSocket реализация (auto, none, wsproto)
+- --lifespan LIFESPAN - Режим жизненного цикла (auto, on, off)
+- --interface INTERFACE - Тип интерфейса (auto, asgi3, asgi2, wsgi)
+- --log-level LEVEL - Уровень логирования (critical, error, warning, info, debug, trace)
+- --access-log - Включить access log
+- --use-colors - Цветной вывод логов
+- --ssl-keyfile PATH - Путь к SSL ключу
+- --ssl-certfile PATH - Путь к SSL сертификату
+- --proxy-headers - Доверять proxy заголовкам
+- --forwarded-allow-ips IPs - Разрешенные IP для forwarded заголовков
+- --limit-concurrency N - Максимальное количество одновременных соединений
+- --limit-max-requests N - Максимальное количество запросов перед перезапуском
+- --timeout-keep-alive SECONDS - Таймаут keep-alive
+- --timeout-graceful-shutdown SECONDS - Таймаут graceful shutdown
+
+ПРОГРАММНЫЙ ЗАПУСК:
+import uvicorn
+uvicorn.run(app, host="127.0.0.1", port=8000)
+uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+uvicorn.run(app, host="0.0.0.0", port=8000, workers=4)
+
+ОСНОВНЫЕ ПАРАМЕТРЫ run():
+- app: ASGI приложение
+- host: Хост
+- port: Порт
+- reload: Автоматическая перезагрузка
+- workers: Количество рабочих процессов
+- loop: Тип event loop
+- log_level: Уровень логирования
+- access_log: Access log
+- ssl_keyfile: SSL ключ
+- ssl_certfile: SSL сертификат
+- forwarded_allow_ips: Разрешенные IP для forwarded
+- proxy_headers: Доверять proxy заголовкам
+- server_header: Включать Server заголовок
+- date_header: Включать Date заголовок
+
+УСТАНОВКА:
+pip install uvicorn
+# С дополнительными зависимостями
+pip install uvicorn[standard]  # включает uvloop, httptools, wsproto
+
+ПРИМЕР КОДА (FastAPI + Uvicorn):
+from fastapi import FastAPI
+import uvicorn
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+
+if __name__ == "__main__":
+    # Программный запуск
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+
+# Запуск из командной строки:
+# uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+ПРИМЕР КОДА (Django ASGI):
+# asgi.py
+import os
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+application = get_asgi_application()
+
+# Запуск:
+# uvicorn myproject.asgi:application --host 0.0.0.0 --port 8000

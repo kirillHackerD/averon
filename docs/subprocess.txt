@@ -1,0 +1,187 @@
+Subprocess Module Documentation
+
+Spawn new processes, connect to their input/output/error pipes. Built-in Python library.
+
+Basic Command Execution:
+import subprocess
+
+# Run simple command
+result = subprocess.run(['echo', 'Hello'], capture_output=True, text=True)
+print(result.stdout)
+
+# Run with shell
+result = subprocess.run('echo Hello', shell=True, capture_output=True, text=True)
+print(result.stdout)
+
+# Check return code
+result = subprocess.run(['ls', '-la'], capture_output=True, text=True)
+print(f"Return code: {result.returncode}")
+
+Capturing Output:
+import subprocess
+
+# Capture stdout
+result = subprocess.run(['ls', '-la'], capture_output=True, text=True)
+print(result.stdout)
+
+# Capture both stdout and stderr
+result = subprocess.run(['ls', 'nonexistent'], capture_output=True, text=True)
+print(f"stdout: {result.stdout}")
+print(f"stderr: {result.stderr}")
+
+# Ignore output
+result = subprocess.run(['ls', '-la'], stdout=subprocess.DEVNULL)
+
+Error Handling:
+import subprocess
+
+# Raise exception on non-zero exit
+try:
+    result = subprocess.run(['ls', 'nonexistent'], check=True, capture_output=True, text=True)
+except subprocess.CalledProcessError as e:
+    print(f"Command failed with exit code {e.returncode}")
+    print(f"stderr: {e.stderr}")
+
+With Timeout:
+import subprocess
+
+try:
+    result = subprocess.run(['sleep', '10'], timeout=5, capture_output=True, text=True)
+except subprocess.TimeoutExpired:
+    print("Command timed out")
+
+Working Directory:
+import subprocess
+
+# Run in specific directory
+result = subprocess.run(
+    ['ls', '-la'],
+    cwd='/home/user',
+    capture_output=True,
+    text=True
+)
+print(result.stdout)
+
+Environment Variables:
+import subprocess
+import os
+
+# Modify environment
+env = os.environ.copy()
+env['MY_VAR'] = 'value'
+
+result = subprocess.run(
+    ['echo', '$MY_VAR'],
+    env=env,
+    shell=True,
+    capture_output=True,
+    text=True
+)
+
+Popen for Advanced Control:
+import subprocess
+
+# Start process
+process = subprocess.Popen(
+    ['python', 'script.py'],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+)
+
+# Wait for completion
+stdout, stderr = process.communicate()
+print(f"stdout: {stdout}")
+print(f"stderr: {stderr}")
+print(f"Return code: {process.returncode}")
+
+Real-time Output:
+import subprocess
+
+process = subprocess.Popen(
+    ['ping', '-c', '4', 'google.com'],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+)
+
+# Read output line by line
+for line in process.stdout:
+    print(line, end='')
+
+process.wait()
+
+Interactive Input:
+import subprocess
+
+process = subprocess.Popen(
+    ['python'],
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+)
+
+# Send input
+stdout, stderr = process.communicate(input='print(2+2)\nexit()\n')
+print(stdout)
+
+Running Python Script:
+import subprocess
+import sys
+
+# Run another Python script
+result = subprocess.run(
+    [sys.executable, 'script.py', 'arg1', 'arg2'],
+    capture_output=True,
+    text=True
+)
+print(result.stdout)
+
+Multiple Commands:
+import subprocess
+
+# Chain commands
+result = subprocess.run(
+    'echo "Hello" | grep "H"',
+    shell=True,
+    capture_output=True,
+    text=True
+)
+print(result.stdout)
+
+Kill Process:
+import subprocess
+import signal
+import time
+
+process = subprocess.Popen(['sleep', '100'])
+time.sleep(2)
+
+# Terminate gracefully
+process.terminate()
+try:
+    process.wait(timeout=5)
+except subprocess.TimeoutExpired:
+    # Force kill if not terminated
+    process.kill()
+    process.wait()
+
+Check if Running:
+import subprocess
+
+process = subprocess.Popen(['sleep', '10'])
+
+if process.poll() is None:
+    print("Process is still running")
+else:
+    print(f"Process exited with code {process.poll()}")
+
+Best Practices:
+- Avoid shell=True when possible (security risk)
+- Use lists instead of strings for arguments
+- Always use check=True or check returncode manually
+- Use timeout to prevent hanging
+- Handle CalledProcessError exceptions
+- Use text=True for string output instead of bytes
+- Never pass user input directly to shell commands

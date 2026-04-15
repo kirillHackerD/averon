@@ -1,0 +1,84 @@
+========================================
+БИБЛИОТЕКА: json
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/json.html
+
+ОПИСАНИЕ:
+Модуль для работы с форматом JSON (JavaScript Object Notation).
+Позволяет сериализовать Python-объекты в JSON и десериализовать JSON в Python-объекты.
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- json.dumps(obj, indent=None, ensure_ascii=True) - Преобразовать объект в JSON строку
+- json.dump(obj, file, indent=None, ensure_ascii=True) - Записать JSON в файл
+- json.loads(json_string) - Преобразовать JSON строку в Python объект
+- json.load(file) - Прочитать JSON из файла
+
+ТИПЫ ДАННЫХ (Python -> JSON):
+- dict -> object
+- list, tuple -> array
+- str -> string
+- int, float -> number
+- True -> true
+- False -> false
+- None -> null
+
+ОСНОВНЫЕ ПАРАМЕТРЫ:
+- indent: Отступы для форматирования (красивый вывод)
+- sort_keys: Сортировка ключей словаря
+- ensure_ascii: Экранирование не-ASCII символов
+- skipkeys: Пропускать ключи не базовых типов
+- default: Функция для сериализации пользовательских типов
+
+ИСКЛЮЧЕНИЯ:
+- JSONDecodeError: Ошибка при разборе JSON строки
+- TypeError: Ошибка при сериализации неподдерживаемого типа
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import json
+
+# Сериализация в строку
+data = {
+    "name": "Иван",
+    "age": 30,
+    "city": "Москва",
+    "is_student": False,
+    "courses": ["Python", "JSON"],
+    "address": None
+}
+
+json_string = json.dumps(data, indent=4, ensure_ascii=False, sort_keys=True)
+print(json_string)
+
+# Запись в файл
+with open('data.json', 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=4, ensure_ascii=False)
+
+# Чтение из файла
+with open('data.json', 'r', encoding='utf-8') as f:
+    loaded_data = json.load(f)
+    print(loaded_data)
+
+# Обработка ошибок
+try:
+    invalid_json = '{"name": "test",}'
+    result = json.loads(invalid_json)
+except json.JSONDecodeError as e:
+    print(f"Ошибка парсинга JSON: {e}")
+
+# Работа с пользовательскими типами
+from datetime import datetime
+
+def datetime_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+data_with_date = {"created_at": datetime.now()}
+json_string = json.dumps(data_with_date, default=datetime_serializer)
+print(json_string)

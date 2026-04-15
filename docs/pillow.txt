@@ -1,0 +1,175 @@
+Pillow (PIL) Library Documentation
+
+Python Imaging Library for image processing and manipulation.
+
+Installation:
+pip install Pillow
+
+Open and Display Image:
+from PIL import Image
+
+# Open image
+img = Image.open('photo.jpg')
+
+# Display image
+img.show()
+
+# Get image info
+print(img.size)      # (width, height)
+print(img.format)    # 'JPEG'
+print(img.mode)      # 'RGB'
+
+Basic Operations:
+from PIL import Image
+
+img = Image.open('photo.jpg')
+
+# Resize
+img_resized = img.resize((300, 200))
+
+# Crop (left, upper, right, lower)
+img_cropped = img.crop((100, 100, 400, 400))
+
+# Rotate
+img_rotated = img.rotate(45)
+
+# Flip
+img_flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
+
+# Save
+img_resized.save('resized.jpg', quality=95)
+
+Convert Modes:
+from PIL import Image
+
+img = Image.open('photo.jpg')
+
+# Convert to grayscale
+gray = img.convert('L')
+
+# Convert to RGBA (with transparency)
+rgba = img.convert('RGBA')
+
+# Convert to palette mode
+palette = img.convert('P')
+
+Thumbnail:
+from PIL import Image
+
+img = Image.open('photo.jpg')
+img.thumbnail((128, 128))  # Preserves aspect ratio
+img.save('thumbnail.jpg')
+
+Paste and Merge:
+from PIL import Image
+
+background = Image.open('background.jpg')
+foreground = Image.open('foreground.png')
+
+# Paste foreground onto background
+background.paste(foreground, (100, 100), foreground)
+background.save('merged.jpg')
+
+ImageDraw - Drawing:
+from PIL import Image, ImageDraw
+
+img = Image.new('RGB', (400, 300), color='white')
+draw = ImageDraw.Draw(img)
+
+# Draw rectangle
+draw.rectangle([(50, 50), (150, 150)], fill='blue', outline='red', width=2)
+
+# Draw ellipse
+draw.ellipse([(200, 50), (350, 150)], fill='green')
+
+# Draw line
+draw.line([(50, 200), (350, 250)], fill='black', width=3)
+
+# Draw text
+from PIL import ImageFont
+try:
+    font = ImageFont.truetype("arial.ttf", 20)
+except:
+    font = ImageFont.load_default()
+
+draw.text((50, 250), "Hello World", fill='black', font=font)
+
+img.save('drawing.jpg')
+
+ImageFilter - Filters:
+from PIL import Image, ImageFilter
+
+img = Image.open('photo.jpg')
+
+# Blur
+blurred = img.filter(ImageFilter.BLUR)
+
+# Gaussian blur
+gaussian = img.filter(ImageFilter.GaussianBlur(radius=5))
+
+# Sharpen
+sharpened = img.filter(ImageFilter.SHARPEN)
+
+# Edge detection
+edges = img.filter(ImageFilter.FIND_EDGES)
+
+# Emboss
+emboss = img.filter(ImageFilter.EMBOSS)
+
+Enhance:
+from PIL import Image, ImageEnhance
+
+img = Image.open('photo.jpg')
+
+# Brightness
+enhancer = ImageEnhance.Brightness(img)
+bright = enhancer.enhance(1.5)  # 1.0 = original
+
+# Contrast
+enhancer = ImageEnhance.Contrast(img)
+high_contrast = enhancer.enhance(1.5)
+
+# Color
+enhancer = ImageEnhance.Color(img)
+saturated = enhancer.enhance(1.5)
+
+# Sharpness
+enhancer = ImageEnhance.Sharpness(img)
+sharper = enhancer.enhance(2.0)
+
+Create Image from Scratch:
+from PIL import Image
+
+# Create new image
+img = Image.new('RGB', (800, 600), color=(255, 0, 0))
+img.save('red_image.jpg')
+
+# Create with transparent background
+img = Image.new('RGBA', (800, 600), (0, 0, 0, 0))
+
+Screenshot:
+from PIL import ImageGrab
+
+# Capture screen
+screenshot = ImageGrab.grab()
+screenshot.save('screenshot.png')
+
+# Capture region (left, top, right, bottom)
+region = ImageGrab.grab(bbox=(100, 100, 400, 400))
+
+Batch Processing:
+from PIL import Image
+import os
+
+for filename in os.listdir('images'):
+    if filename.endswith('.jpg'):
+        img = Image.open(f'images/{filename}')
+        img.thumbnail((200, 200))
+        img.save(f'thumbs/{filename}')
+
+Best Practices:
+- Always use context managers or close images when done
+- Use thumbnail() for aspect-ratio-preserving resize
+- Convert to appropriate mode before processing
+- Handle exceptions for corrupt images
+- Use Image.ANTIALIAS (or Image.LANCZOS) for high-quality resize

@@ -1,0 +1,153 @@
+Docker Documentation
+
+Docker is a platform for developing, shipping, and running applications in containers.
+
+Basic Commands:
+# Build image
+docker build -t myapp:1.0 .
+
+# Run container
+docker run -p 8080:80 myapp:1.0
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Stop container
+docker stop container_id
+
+# Remove container
+docker rm container_id
+
+# List images
+docker images
+
+# Remove image
+docker rmi image_id
+
+Dockerfile:
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy application code
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Run application
+CMD ["node", "index.js"]
+
+Docker Compose:
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+Multi-stage Dockerfile:
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+EXPOSE 3000
+CMD ["node", "index.js"]
+
+Environment Variables:
+# In Dockerfile
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# In docker-compose.yml
+environment:
+  - NODE_ENV=production
+  - PORT=3000
+
+# From .env file
+env_file:
+  - .env
+
+Volumes:
+# Bind mount (development)
+docker run -v /path/to/app:/app myapp
+
+# Named volume (production)
+docker run -v app_data:/app/data myapp
+
+# Anonymous volume
+docker run -v /app/data myapp
+
+Networking:
+# Create network
+docker network create myapp-network
+
+# Connect container to network
+docker run --network myapp-network myapp
+
+# In docker-compose.yml
+networks:
+  myapp-network:
+    driver: bridge
+
+Health Checks:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+Best Practices:
+- Use specific versions instead of latest
+- Use .dockerignore file
+- Minimize image size (use alpine variants)
+- Don't run as root user
+- Use multi-stage builds
+- Use health checks
+- Use environment variables for configuration
+- Use volumes for persistent data
+
+.dockerignore:
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output

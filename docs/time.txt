@@ -1,0 +1,203 @@
+========================================
+БИБЛИОТЕКА: time
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/time.html
+
+ОПИСАНИЕ:
+Модуль для работы со временем. Предоставляет функции для получения
+текущего времени, задержек, преобразования форматов времени и т.д.
+
+ОСНОВНЫЕ ФУНКЦИИ:
+
+ИЗМЕРЕНИЕ ВРЕМЕНИ:
+- time.time() - Текущее время в секундах (Unix timestamp)
+- time.monotonic() - Монотонное время (не может идти назад)
+- time.perf_counter() - Высокоточный счетчик производительности
+- time.process_time() - Время процессора для текущего процесса
+- time.thread_time() - Время процессора для текущего потока
+
+ЗАДЕРЖКИ:
+- time.sleep(seconds) - Остановка выполнения на секунды
+- time.sleep(seconds) - Дробные секунды поддерживаются
+
+ПРЕОБРАЗОВАНИЕ ВРЕМЕНИ:
+- time.gmtime([secs]) - Преобразование в UTC struct_time
+- time.localtime([secs]) - Преобразование в локальное struct_time
+- time.mktime(t) - Преобразование struct_time в timestamp
+- time.strftime(format, t) - Форматирование struct_time в строку
+- time.strptime(string, format) - Разбор строки в struct_time
+- time.asctime([t]) - Преобразование struct_time в строку
+- time.ctime([secs]) - Преобразование timestamp в строку
+
+СТРУКТУРА struct_time:
+- tm_year: Год (например, 2024)
+- tm_mon: Месяц (1-12)
+- tm_mday: День месяца (1-31)
+- tm_hour: Час (0-23)
+- tm_min: Минута (0-59)
+- tm_sec: Секунда (0-61)
+- tm_wday: День недели (0-6, 0 = понедельник)
+- tm_yday: День года (1-366)
+- tm_isdst: Летнее время (-1, 0, 1)
+
+КОНСТАНТЫ:
+- time.timezone - Смещение часового пояса (сек)
+- time.altzone - Смещение летнего времени (сек)
+- time.daylight - Используется ли летнее время
+- time.tzname - Имена часовых поясов
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import time
+from datetime import datetime
+
+# ТЕКУЩЕЕ ВРЕМЯ
+print(f"time(): {time.time()}")
+print(f"monotonic(): {time.monotonic()}")
+print(f"perf_counter(): {time.perf_counter()}")
+print(f"process_time(): {time.process_time()}")
+
+# ЗАДЕРЖКИ
+print("Начало задержки...")
+time.sleep(2)
+print("2 секунды прошло")
+
+# Задержка с дробными секундами
+time.sleep(0.5)
+print("0.5 секунды прошло")
+
+# STRUCT_TIME
+print("\n=== struct_time ===")
+current_time = time.localtime()
+print(f"localtime(): {current_time}")
+print(f"Год: {current_time.tm_year}")
+print(f"Месяц: {current_time.tm_mon}")
+print(f"День: {current_time.tm_mday}")
+print(f"Час: {current_time.tm_hour}")
+print(f"Минута: {current_time.tm_min}")
+print(f"Секунда: {current_time.tm_sec}")
+print(f"День недели: {current_time.tm_wday}")
+print(f"День года: {current_time.tm_yday}")
+print(f"Летнее время: {current_time.tm_isdst}")
+
+# UTC ВРЕМЯ
+utc_time = time.gmtime()
+print(f"\ngmtime(): {utc_time}")
+
+# ФОРМАТИРОВАНИЕ ВРЕМЕНИ
+print("\n=== ФОРМАТИРОВАНИЕ ===")
+formatted = time.strftime("%Y-%m-%d %H:%M:%S", current_time)
+print(f"strftime: {formatted}")
+
+# Другие форматы
+print(f"asctime: {time.asctime(current_time)}")
+print(f"ctime: {time.ctime()}")
+
+# ФОРМАТЫ СТРОК
+formats = {
+    "%Y": "Год (4 цифры)",
+    "%y": "Год (2 цифры)",
+    "%m": "Месяц (01-12)",
+    "%d": "День месяца (01-31)",
+    "%H": "Час (00-23)",
+    "%I": "Час (01-12)",
+    "%M": "Минута (00-59)",
+    "%S": "Секунда (00-59)",
+    "%A": "Полное название дня недели",
+    "%a": "Сокращенное название дня недели",
+    "%B": "Полное название месяца",
+    "%b": "Сокращенное название месяца",
+    "%j": "День года (001-366)",
+    "%U": "Номер недели (воскресенье)",
+    "%W": "Номер недели (понедельник)",
+    "%w": "День недели (0-6, 0=воскресенье)",
+    "%Z": "Часовой пояс",
+    "%z": "Смещение часового пояса"
+}
+
+for fmt, desc in formats.items():
+    print(f"{fmt}: {desc} -> {time.strftime(fmt, current_time)}")
+
+# ПРЕОБРАЗОВАНИЕ СТРОКИ В struct_time
+date_string = "2024-12-31 23:59:59"
+parsed = time.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+print(f"\nstrptime('{date_string}'): {parsed}")
+
+# ПРЕОБРАЗОВАНИЕ timestamp <-> struct_time
+timestamp = time.time()
+print(f"\nТекущий timestamp: {timestamp}")
+
+# struct_time из timestamp
+struct_from_ts = time.localtime(timestamp)
+print(f"localtime из timestamp: {time.strftime('%Y-%m-%d %H:%M:%S', struct_from_ts)}")
+
+# timestamp из struct_time
+ts_from_struct = time.mktime(struct_from_ts)
+print(f"mktime: {ts_from_struct}")
+
+# ИЗМЕРЕНИЕ ВРЕМЕНИ ВЫПОЛНЕНИЯ
+start = time.perf_counter()
+time.sleep(1.5)
+end = time.perf_counter()
+print(f"\nВремя выполнения: {end - start:.4f} секунд")
+
+# ИЗМЕРЕНИЕ С МНОГОКРАТНЫМ ЗАПУСКОМ
+def measure_time(func, *args, **kwargs):
+    start = time.perf_counter()
+    result = func(*args, **kwargs)
+    end = time.perf_counter()
+    return result, end - start
+
+def slow_function():
+    time.sleep(0.5)
+    return "Готово"
+
+result, elapsed = measure_time(slow_function)
+print(f"Функция выполнена за {elapsed:.4f} сек: {result}")
+
+# КОНСТАНТЫ ЧАСОВЫХ ПОЯСОВ
+print(f"\n=== ЧАСОВЫЕ ПОЯСА ===")
+print(f"timezone: {time.timezone} сек ({time.timezone / 3600} ч)")
+print(f"altzone: {time.altzone} сек")
+print(f"daylight: {time.daylight}")
+print(f"tzname: {time.tzname}")
+
+# ВРЕМЯ ВЫПОЛНЕНИЯ ПРОЦЕССА
+process_start = time.process_time()
+# Выполнение каких-то операций
+sum(range(10000000))
+process_end = time.process_time()
+print(f"Время процессора: {process_end - process_start:.4f} сек")
+
+# ИЗМЕРЕНИЕ ВРЕМЕНИ В ЦИКЛЕ
+print("\n=== ИЗМЕРЕНИЕ В ЦИКЛЕ ===")
+for i in range(3):
+    start = time.perf_counter()
+    time.sleep(0.1 * i)
+    end = time.perf_counter()
+    print(f"Итерация {i}: {end - start:.4f} сек")
+
+# ТАЙМЕР С ОБРАТНЫМ ОТСЧЕТОМ
+def countdown(seconds):
+    for i in range(seconds, 0, -1):
+        print(f"\rОсталось: {i} сек", end="", flush=True)
+        time.sleep(1)
+    print("\rТаймер завершен!    ")
+
+# countdown(5)  # Раскомментировать для теста
+
+# ИЗМЕРЕНИЕ СКОРОСТИ ЧТЕНИЯ
+def speed_test():
+    start = time.perf_counter()
+    with open(__file__, 'r') as f:
+        content = f.read()
+    end = time.perf_counter()
+    size = len(content) / 1024
+    print(f"Прочитано {size:.2f} KB за {end - start:.4f} сек")
+
+speed_test()

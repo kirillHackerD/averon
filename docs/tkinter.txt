@@ -1,0 +1,278 @@
+Tkinter Documentation
+
+Tkinter is Python's standard GUI (Graphical User Interface) package.
+
+Basic Window:
+import tkinter as tk
+from tkinter import ttk
+
+# Create main window
+root = tk.Tk()
+root.title('My Application')
+root.geometry('400x300')
+root.mainloop()
+
+Widgets:
+# Label
+label = tk.Label(root, text='Hello, World!', font=('Arial', 12))
+label.pack(pady=10)
+
+# Button
+def on_click():
+    print('Button clicked!')
+
+button = tk.Button(root, text='Click Me', command=on_click)
+button.pack(pady=5)
+
+# Entry
+entry = tk.Entry(root, width=30)
+entry.pack(pady=5)
+text = entry.get()
+
+# Text widget
+text_widget = tk.Text(root, height=10, width=40)
+text_widget.pack(pady=5)
+content = text_widget.get('1.0', tk.END)
+
+# Listbox
+listbox = tk.Listbox(root)
+listbox.pack(pady=5)
+listbox.insert(tk.END, 'Item 1')
+listbox.insert(tk.END, 'Item 2')
+selection = listbox.get(listbox.curselection())
+
+Layout Management:
+# pack() - simple layout
+widget.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+
+# grid() - table layout
+label1 = tk.Label(root, text='Name:')
+label1.grid(row=0, column=0, padx=5, pady=5)
+entry1 = tk.Entry(root)
+entry1.grid(row=0, column=1, padx=5, pady=5)
+
+# place() - absolute positioning
+widget.place(x=50, y=50, width=100, height=30)
+
+Frames:
+# Create frame
+frame = tk.Frame(root, relief=tk.RAISED, borderwidth=1)
+frame.pack(fill=tk.BOTH, expand=True)
+
+# Add widgets to frame
+label = tk.Label(frame, text='In Frame')
+label.pack(pady=10)
+
+Menu Bar:
+# Create menu bar
+menubar = tk.Menu(root)
+root.config(menu=menubar)
+
+# File menu
+file_menu = tk.Menu(menubar, tearoff=0)
+menubar.add_cascade(label='File', menu=file_menu)
+file_menu.add_command(label='New', command=new_file)
+file_menu.add_command(label='Open', command=open_file)
+file_menu.add_separator()
+file_menu.add_command(label='Exit', command=root.quit)
+
+# Edit menu
+edit_menu = tk.Menu(menubar, tearoff=0)
+menubar.add_cascade(label='Edit', menu=edit_menu)
+edit_menu.add_command(label='Cut', command=cut_text)
+edit_menu.add_command(label='Copy', command=copy_text)
+edit_menu.add_command(label='Paste', command=paste_text)
+
+Dialogs:
+from tkinter import messagebox, filedialog, simpledialog
+
+# Message boxes
+messagebox.showinfo('Info', 'Information message')
+messagebox.showwarning('Warning', 'Warning message')
+messagebox.showerror('Error', 'Error message')
+result = messagebox.askyesno('Question', 'Yes or No?')
+
+# File dialogs
+filename = filedialog.askopenfilename(
+    title='Open File',
+    filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')]
+)
+filename = filedialog.asksaveasfilename(
+    title='Save File',
+    defaultextension='.txt'
+)
+
+# Simple dialog
+name = simpledialog.askstring('Input', 'Enter your name:')
+age = simpledialog.askinteger('Input', 'Enter your age:', minvalue=0, maxvalue=120)
+
+Canvas Widget:
+canvas = tk.Canvas(root, width=400, height=300, bg='white')
+canvas.pack()
+
+# Draw shapes
+canvas.create_line(10, 10, 100, 100, fill='blue', width=2)
+canvas.create_rectangle(50, 50, 150, 100, fill='red', outline='black')
+canvas.create_oval(100, 100, 200, 200, fill='green')
+canvas.create_text(200, 50, text='Hello Canvas', font=('Arial', 12))
+
+# Handle events
+def on_canvas_click(event):
+    x, y = event.x, event.y
+    canvas.create_oval(x-10, y-10, x+10, y+10, fill='blue')
+
+canvas.bind('<Button-1>', on_canvas_click)
+
+Notebook (Tabs):
+notebook = ttk.Notebook(root)
+notebook.pack(fill=tk.BOTH, expand=True)
+
+# Tab 1
+tab1 = ttk.Frame(notebook)
+notebook.add(tab1, text='Tab 1')
+label1 = tk.Label(tab1, text='Content of Tab 1')
+label1.pack(pady=20)
+
+# Tab 2
+tab2 = ttk.Frame(notebook)
+notebook.add(tab2, text='Tab 2')
+label2 = tk.Label(tab2, text='Content of Tab 2')
+label2.pack(pady=20)
+
+Treeview (Table):
+tree = ttk.Treeview(root, columns=('Name', 'Age', 'City'), show='headings')
+tree.heading('Name', text='Name')
+tree.heading('Age', text='Age')
+tree.heading('City', text='City')
+tree.pack(fill=tk.BOTH, expand=True)
+
+# Add data
+tree.insert('', tk.END, values=('John', 25, 'New York'))
+tree.insert('', tk.END, values=('Jane', 30, 'London'))
+
+# Get selection
+def on_tree_select(event):
+    selected = tree.selection()
+    if selected:
+        item = tree.item(selected[0])
+        values = item['values']
+        print(values)
+
+tree.bind('<<TreeviewSelect>>', on_tree_select)
+
+Progress Bar:
+progress = ttk.Progressbar(root, length=200, mode='determinate')
+progress.pack(pady=10)
+
+# Update progress
+progress['value'] = 50
+root.update_idletasks()
+
+# Indeterminate mode
+progress = ttk.Progressbar(root, length=200, mode='indeterminate')
+progress.pack(pady=10)
+progress.start(10)  # Move every 10ms
+
+Scale Widget:
+scale = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, length=200)
+scale.pack(pady=10)
+
+def on_scale_change(value):
+    print(f'Scale value: {value}')
+
+scale.config(command=on_scale_change)
+
+Checkbuttons and Radiobuttons:
+# Checkbutton
+var1 = tk.IntVar()
+check1 = tk.Checkbutton(root, text='Option 1', variable=var1)
+check1.pack()
+if var1.get():  # Check if checked
+    print('Option 1 is selected')
+
+# Radiobuttons
+var2 = tk.StringVar()
+radio1 = tk.Radiobutton(root, text='Choice 1', variable=var2, value='choice1')
+radio2 = tk.Radiobutton(root, text='Choice 2', variable=var2, value='choice2')
+radio1.pack()
+radio2.pack()
+print(f'Selected: {var2.get()}')
+
+Styling with ttk:
+# Use themed widgets
+style = ttk.Style()
+style.configure('TButton', font=('Arial', 10), padding=5)
+style.configure('TLabel', font=('Arial', 10))
+
+button = ttk.Button(root, text='Themed Button')
+label = ttk.Label(root, text='Themed Label')
+
+Event Handling:
+# Bind events
+def on_key_press(event):
+    print(f'Key pressed: {event.char}')
+
+def on_mouse_motion(event):
+    print(f'Mouse position: {event.x}, {event.y}')
+
+root.bind('<Key>', on_key_press)
+root.bind('<Motion>', on_mouse_motion)
+
+# Custom events
+def custom_handler(event):
+    print('Custom event triggered')
+
+root.bind('<<CustomEvent>>', custom_handler)
+root.event_generate('<<CustomEvent>>')
+
+Themed Widgets (ttk):
+import tkinter.ttk as ttk
+
+# Combobox
+combo = ttk.Combobox(root, values=['Option 1', 'Option 2', 'Option 3'])
+combo.pack(pady=5)
+combo.set('Option 1')  # Set default value
+
+# Spinbox
+spinbox = ttk.Spinbox(root, from_=0, to=100, increment=5)
+spinbox.pack(pady=5)
+
+# Separator
+separator = ttk.Separator(root, orient='horizontal')
+separator.pack(fill=tk.X, pady=10)
+
+File Dialog Example:
+def open_file():
+    filename = filedialog.askopenfilename(
+        title='Open Text File',
+        filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')]
+    )
+    if filename:
+        with open(filename, 'r') as file:
+            text_widget.delete('1.0', tk.END)
+            text_widget.insert('1.0', file.read())
+
+def save_file():
+    filename = filedialog.asksaveasfilename(
+        title='Save Text File',
+        defaultextension='.txt',
+        filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')]
+    )
+    if filename:
+        with open(filename, 'w') as file:
+            file.write(text_widget.get('1.0', tk.END))
+
+# Menu buttons
+open_btn = tk.Button(root, text='Open', command=open_file)
+save_btn = tk.Button(root, text='Save', command=save_file)
+open_btn.pack(pady=5)
+save_btn.pack(pady=5)
+
+Best Practices:
+- Use ttk widgets for modern look
+- Organize code with classes for complex apps
+- Use proper layout managers (pack/grid/place)
+- Handle window closing event
+- Use consistent padding and spacing
+- Separate UI logic from business logic
+- Test on different platforms (Windows/Mac/Linux)

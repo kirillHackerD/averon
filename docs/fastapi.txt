@@ -1,0 +1,64 @@
+========================================
+БИБЛИОТЕКА: FastAPI
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://fastapi.tiangolo.com
+
+ОПИСАНИЕ:
+Современный, быстрый (высокопроизводительный) веб-фреймворк для создания
+API на Python. Основан на стандартных Python-типах. Автоматически генерирует
+интерактивную документацию API (Swagger UI и ReDoc).
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- Path Operations: Декораторы (@app.get, @app.post, @app.put, @app.delete)
+- Path Parameters: Параметры пути в URL
+- Query Parameters: Параметры запроса (?key=value)
+- Request Body: Тело запроса (Pydantic модели)
+- Response Model: Модель ответа (валидация и фильтрация)
+- Dependencies: Система внедрения зависимостей
+- Middleware: Промежуточные обработчики
+
+ОСНОВНЫЕ ВОЗМОЖНОСТИ:
+- Асинхронность (async/await) для I/O операций [citation:1]
+- Автоматическая валидация данных через Pydantic
+- Автоматическая генерация OpenAPI (Swagger) документации
+- Высокая производительность (наравне с NodeJS и Go)
+- Поддержка WebSockets
+- Встроенная безопасность (CORS, аутентификация)
+
+ВАЖНЫЕ МОМЕНТЫ ПО АСИНХРОННОСТИ:
+- Используйте async def, если библиотеки поддерживают await [citation:1]
+- Используйте обычный def для синхронных библиотек (например, большинство DB) [citation:1]
+- Можно смешивать async и обычные функции в одном приложении [citation:1]
+- FastAPI автоматически оптимизирует выполнение [citation:1]
+
+ОСНОВНЫЕ МОДЕЛИ:
+- Response: Для установки пользовательских заголовков [citation:5]
+- response_model: Параметр декоратора для фильтрации выходных данных [citation:9]
+- Return Type Annotations: Типизация возвращаемых значений [citation:9]
+
+УСТАНОВКА:
+pip install fastapi
+pip install uvicorn  # ASGI сервер для запуска
+
+ПРИМЕР КОДА:
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.post("/items/")
+async def create_item(item: Item) -> Item:
+    return item
+
+# Запуск: uvicorn main:app --reload

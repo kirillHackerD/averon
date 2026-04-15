@@ -1,0 +1,69 @@
+========================================
+БИБЛИОТЕКА: PyTorch (torch)
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://pytorch.org/docs/stable/index.html
+РЕПОЗИТОРИЙ: https://github.com/pytorch/pytorch
+
+ОПИСАНИЕ:
+Фреймворк для глубокого обучения и машинного обучения с поддержкой GPU.
+Обеспечивает гибкость динамических вычислительных графов.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ [citation:6]:
+- Tensors: N-мерные массивы (аналог NumPy) с поддержкой GPU
+- Autograd: Автоматическое дифференцирование для вычисления градиентов
+- nn.Module: Базовый класс для построения нейронных сетей
+- DataLoaders: Инструменты для эффективной загрузки данных (батчи, перемешивание)
+
+ОСНОВНЫЕ МОДУЛИ:
+- torch: Основной модуль с тензорами и математическими операциями
+- torch.nn: Нейросетевые слои, функции активации, функции потерь
+- torch.optim: Оптимизаторы (SGD, Adam, RMSprop и др.)
+- torch.utils.data: Датасеты и даталоадеры
+- torchvision: Работа с изображениями (CV)
+- torchaudio: Работа с аудио
+- torchtext: Работа с текстом
+
+ОСНОВНЫЕ ОПЕРАЦИИ:
+- torch.tensor(data) - Создание тензора
+- tensor.to(device) - Перемещение на GPU/CPU
+- tensor.requires_grad_(True) - Включение отслеживания градиентов
+- loss.backward() - Обратное распространение ошибки
+- optimizer.step() - Обновление весов модели
+
+ОСОБЕННОСТИ:
+- Динамические вычислительные графы (define-by-run)
+- Поддержка CUDA для GPU-ускорения
+- Интеграция с NumPy
+- Поддержка распределенного обучения
+- ONNX экспорт моделей
+
+УСТАНОВКА:
+# CPU версия
+pip install torch torchvision torchaudio
+
+# GPU версия (CUDA 11.8)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+ПРИМЕР КОДА:
+import torch
+import torch.nn as nn
+
+# Создание тензора
+x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+
+# Простая нейросеть
+model = nn.Sequential(
+    nn.Linear(10, 5),
+    nn.ReLU(),
+    nn.Linear(5, 1)
+)
+
+# Обучение
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+output = model(input_data)
+loss = loss_fn(output, target)
+loss.backward()
+optimizer.step()

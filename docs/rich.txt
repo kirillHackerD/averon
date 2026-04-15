@@ -1,0 +1,271 @@
+========================================
+БИБЛИОТЕКА: Rich
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://rich.readthedocs.io/
+РЕПОЗИТОРИЙ: https://github.com/Textualize/rich
+
+ОПИСАНИЕ:
+Библиотека для форматированного вывода в терминал.
+Поддерживает цвета, стили, таблицы, прогресс-бары, синтаксис, markdown,
+деревья, панели и многое другое.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- Console: Основной объект для вывода
+- print: Расширенная версия print
+- Panel: Панель с рамкой
+- Table: Таблица
+- Tree: Дерево
+- Progress: Прогресс-бар
+- Status: Индикатор статуса
+- Syntax: Подсветка синтаксиса
+- Markdown: Отображение Markdown
+- Rule: Разделительная линия
+- Layout: Макет
+
+ОСНОВНЫЕ КЛАССЫ:
+- Console: Управление выводом в терминал
+- Console.print() - Вывод с форматированием
+- Console.log() - Логирование с временными метками
+- Console.rule() - Разделительная линия
+- Console.clear() - Очистка экрана
+- Console.status() - Контекстный менеджер статуса
+- Console.input() - Ввод с подсказкой
+
+СТИЛИ:
+- bold: Жирный
+- italic: Курсив
+- underline: Подчеркнутый
+- blink: Мигающий
+- reverse: Инвертированный
+- dim: Тусклый
+- strike: Зачеркнутый
+
+ЦВЕТА:
+- red, green, blue, yellow, cyan, magenta, black, white
+- bright_red, bright_green, bright_blue и т.д.
+- color(число) - 256 цветов
+- rgb(255,128,0) - RGB цвет
+
+УСТАНОВКА:
+pip install rich
+
+ПРИМЕР КОДА:
+from rich.console import Console
+from rich.table import Table
+from rich.tree import Tree
+from rich.progress import Progress, track, SpinnerColumn, TextColumn
+from rich.panel import Panel
+from rich.syntax import Syntax
+from rich.markdown import Markdown
+from rich import print as rprint
+from rich import inspect
+from rich.layout import Layout
+from rich.prompt import Prompt, Confirm, IntPrompt
+from rich.columns import Columns
+from rich.align import Align
+from rich.text import Text
+from rich.rule import Rule
+import time
+
+console = Console()
+
+# БАЗОВЫЙ ВЫВОД
+console.print("Hello, [bold red]World![/bold red]")
+console.print("Это [italic green]курсивный зеленый[/italic green] текст")
+console.print("[bold yellow]Жирный желтый[/bold yellow] и [underline blue]подчеркнутый синий[/underline blue]")
+
+# РАСШИРЕННЫЙ PRINT
+rprint("[bold magenta]Rich[/bold magenta] [cyan]print[/cyan]")
+
+# ПАНЕЛЬ
+panel = Panel(
+    "[bold]Заголовок панели[/bold]\nЭто содержимое панели",
+    title="Панель",
+    border_style="green",
+    padding=(1, 2)
+)
+console.print(panel)
+
+# ТАБЛИЦА
+table = Table(title="Пользователи", show_header=True, header_style="bold magenta")
+table.add_column("ID", style="cyan", width=10)
+table.add_column("Имя", style="green")
+table.add_column("Email", style="blue")
+table.add_column("Роль", justify="center")
+
+table.add_row("1", "Иван Иванов", "ivan@example.com", "admin")
+table.add_row("2", "Мария Петрова", "maria@example.com", "user")
+table.add_row("3", "Петр Сидоров", "petr@example.com", "user")
+
+console.print(table)
+
+# ДЕРЕВО
+tree = Tree("[bold green]Проект[/bold green]")
+py_tree = tree.add("[bold yellow]src[/bold yellow]")
+py_tree.add("main.py")
+py_tree.add("utils.py")
+py_tree.add("config.py")
+
+tests_tree = tree.add("[bold yellow]tests[/bold yellow]")
+tests_tree.add("test_main.py")
+tests_tree.add("test_utils.py")
+
+docs_tree = tree.add("[bold yellow]docs[/bold yellow]")
+docs_tree.add("README.md")
+docs_tree.add("API.md")
+
+console.print(tree)
+
+# ПРОГРЕСС-БАР
+with Progress() as progress:
+    task = progress.add_task("[green]Обработка...", total=100)
+    for i in range(100):
+        time.sleep(0.01)
+        progress.update(task, advance=1)
+
+# ПРОГРЕСС-БАР СТИЛИЗОВАННЫЙ
+with Progress(
+    SpinnerColumn(),
+    TextColumn("[progress.description]{task.description}"),
+    console=console
+) as progress:
+    progress.add_task("[red]Загрузка...", total=None)
+    time.sleep(2)
+
+# TRACK (простая обертка)
+for i in track(range(100), description="[cyan]Выполнение..."):
+    time.sleep(0.01)
+
+# СТАТУС
+with console.status("[bold green]Выполняется операция...") as status:
+    time.sleep(2)
+    console.log("Шаг 1 завершен")
+    time.sleep(2)
+    console.log("Шаг 2 завершен")
+    time.sleep(1)
+
+# ПОДСВЕТКА СИНТАКСИСА
+code = """
+def hello_world():
+    print("Hello, World!")
+    
+for i in range(5):
+    hello_world()
+"""
+syntax = Syntax(code, "python", theme="monokai", line_numbers=True)
+console.print(syntax)
+
+# MARKDOWN
+markdown_text = """
+# Заголовок
+## Подзаголовок
+
+Это **жирный** и *курсивный* текст.
+
+- Элемент списка 1
+- Элемент списка 2
+- Элемент списка 3
+
+```python
+def example():
+    return "Hello"d = Markdown(markdown_text)
+console.print(md)
+
+ЛОГИРОВАНИЕ
+console.log("Обычное сообщение")
+console.log("[red]Ошибка![/red]", style="bold red")
+console.log("Объект", {"key": "value"}, [1, 2, 3])
+
+РАЗДЕЛИТЕЛЬ
+console.rule("[bold red]Разделитель[/bold red]")
+
+ВВОД
+name = Prompt.ask("Введите ваше имя")
+console.print(f"Привет, [green]{name}[/green]!")
+
+age = IntPrompt.ask("Сколько вам лет", default=18)
+console.print(f"Вам [cyan]{age}[/cyan] лет")
+
+if Confirm.ask("Продолжить?"):
+console.print("[green]Продолжаем...[/green]")
+else:
+console.print("[red]Остановлено[/red]")
+
+КОЛОНКИ
+columns = Columns([
+Panel("Элемент 1", style="blue"),
+Panel("Элемент 2", style="green"),
+Panel("Элемент 3", style="red"),
+Panel("Элемент 4", style="yellow"),
+], align="center")
+console.print(columns)
+
+ТЕКСТ С ФОРМАТИРОВАНИЕМ
+text = Text("Rich поддерживает ")
+text.append("цвета", style="red")
+text.append(", ")
+text.append("стили", style="bold")
+text.append(" и ")
+text.append("многое другое", style="underline blue")
+console.print(text)
+
+ВЫРАВНИВАНИЕ
+aligned = Align.center(Panel("[bold]Центрированный текст[/bold]"))
+console.print(aligned)
+
+INSPECT (инспекция объектов)
+console.print("[bold]Инспекция объекта:[/bold]")
+inspect(console, methods=True, help=True)
+
+ЛЕЙАУТ (сложная структура)
+layout = Layout()
+layout.split(
+Layout(name="header", size=3),
+Layout(name="body"),
+Layout(name="footer", size=3)
+)
+layout["body"].split_row(
+Layout(name="sidebar", size=20),
+Layout(name="content")
+)
+layout["header"].update(Panel("[bold]Заголовок[/bold]", style="blue"))
+layout["sidebar"].update(Panel("Боковая панель\n- Пункт 1\n- Пункт 2", style="green"))
+layout["content"].update(Panel("Основной контент\nЗдесь может быть любой текст"))
+layout["footer"].update(Panel("Подвал", style="red"))
+
+console.print(layout)
+
+РАЗНЫЕ СТИЛИ
+console.print("[bold]Жирный[/bold]")
+console.print("[italic]Курсив[/italic]")
+console.print("[underline]Подчеркнутый[/underline]")
+console.print("[reverse]Инвертированный[/reverse]")
+console.print("[dim]Тусклый[/dim]")
+console.print("[strike]Зачеркнутый[/strike]")
+console.print("[blink]Мигающий[/blink]")
+
+ЦВЕТА
+console.print("[red]Красный[/red]")
+console.print("[green]Зеленый[/green]")
+console.print("[blue]Синий[/blue]")
+console.print("[yellow]Желтый[/yellow]")
+console.print("[cyan]Циан[/cyan]")
+console.print("[magenta]Маджента[/magenta]")
+
+RGB ЦВЕТА
+console.print("[rgb(255,128,0)]Оранжевый RGB[/rgb(255,128,0)]")
+
+256 ЦВЕТОВ
+console.print("[color(123)]Цвет 123[/color(123)]")
+
+СМЕШИВАНИЕ СТИЛЕЙ
+console.print("[bold red]Жирный красный[/bold red]")
+console.print("[italic underline blue]Курсив подчеркнутый синий[/italic underline blue]")
+
+ВЫВОД С ИЗОБРАЖЕНИЯМИ (если поддерживается)
+console.print("[img]path/to/image.png[/img]")
+ОЧИСТКА ЭКРАНА
+console.clear()

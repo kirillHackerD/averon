@@ -1,0 +1,285 @@
+Pygame Documentation
+
+Pygame is a set of Python modules designed for writing video games.
+
+Installation:
+pip install pygame
+
+Basic Setup:
+import pygame
+import sys
+
+# Initialize pygame
+pygame.init()
+
+# Set up the display
+screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption('My Game')
+
+# Game loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    
+    # Game logic here
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
+
+Colors and Screen:
+# Define colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# Screen operations
+screen.fill(BLACK)
+pygame.display.flip()  # Update display
+pygame.display.update()  # Update specific area
+
+Drawing Shapes:
+# Draw rectangle
+pygame.draw.rect(screen, RED, (x, y, width, height))
+pygame.draw.rect(screen, BLUE, (x, y, width, height), 2)  # 2px border
+
+# Draw circle
+pygame.draw.circle(screen, GREEN, (center_x, center_y), radius)
+pygame.draw.circle(screen, WHITE, (center_x, center_y), radius, 3)
+
+# Draw line
+pygame.draw.line(screen, WHITE, (x1, y1), (x2, y2), width)
+
+# Draw polygon
+points = [(x1, y1), (x2, y2), (x3, y3)]
+pygame.draw.polygon(screen, RED, points)
+
+# Draw ellipse
+pygame.draw.ellipse(screen, BLUE, (x, y, width, height))
+
+Images:
+# Load image
+image = pygame.image.load('image.png')
+image_rect = image.get_rect()
+
+# Scale image
+scaled_image = pygame.transform.scale(image, (new_width, new_height))
+
+# Rotate image
+rotated_image = pygame.transform.rotate(image, angle)
+
+# Draw image
+screen.blit(image, (x, y))
+screen.blit(image, image_rect)  # Use rect position
+
+# Transparent color
+image.set_colorkey(WHITE)  # Make white transparent
+
+Text and Fonts:
+# Load font
+font = pygame.font.Font(None, 36)  # Default font
+custom_font = pygame.font.Font('arial.ttf', 24)
+
+# Render text
+text = font.render('Hello World', True, WHITE, BLACK)  # Text, antialias, color, background
+text_rect = text.get_rect(center=(400, 300))
+
+# Draw text
+screen.blit(text, text_rect)
+
+# Text input
+input_text = ''
+font = pygame.font.Font(None, 32)
+
+def handle_input(event):
+    global input_text
+    if event.key == pygame.K_BACKSPACE:
+        input_text = input_text[:-1]
+    else:
+        input_text += event.unicode
+
+Sound and Music:
+# Initialize mixer
+pygame.mixer.init()
+
+# Load sound
+sound = pygame.mixer.Sound('sound.wav')
+pygame.mixer.music.load('background.mp3')
+
+# Play sound
+sound.play()
+pygame.mixer.music.play(-1)  # Loop indefinitely
+pygame.mixer.music.set_volume(0.5)
+
+# Stop music
+pygame.mixer.music.stop()
+
+Game Clock and FPS:
+# Create clock
+clock = pygame.time.Clock()
+FPS = 60
+
+# In game loop
+clock.tick(FPS)  # Limit to 60 FPS
+
+# Get delta time
+dt = clock.get_time() / 1000.0  # Delta time in seconds
+
+Keyboard Input:
+# Check key states
+keys = pygame.key.get_pressed()
+if keys[pygame.K_LEFT]:
+    player_x -= 5
+if keys[pygame.K_RIGHT]:
+    player_x += 5
+
+# Handle key events
+for event in pygame.event.get():
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_SPACE:
+            jump()
+    elif event.type == pygame.KEYUP:
+        if event.key == pygame.K_SPACE:
+            stop_jump()
+
+Mouse Input:
+# Get mouse position
+mouse_x, mouse_y = pygame.mouse.get_pos()
+mouse_buttons = pygame.mouse.get_pressed()
+
+# Handle mouse events
+for event in pygame.event.get():
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.button == 1:  # Left click
+            handle_click(mouse_x, mouse_y)
+    elif event.type == pygame.MOUSEMOTION:
+        handle_mouse_motion(mouse_x, mouse_y)
+
+Sprites and Sprite Groups:
+# Create sprite class
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([50, 50])
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.center = (400, 300)
+    
+    def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= 5
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += 5
+
+# Create sprite groups
+all_sprites = pygame.sprite.Group()
+players = pygame.sprite.Group()
+
+# Create and add sprite
+player = Player()
+all_sprites.add(player)
+players.add(player)
+
+# Update and draw sprites
+all_sprites.update()
+all_sprites.draw(screen)
+
+# Collision detection
+pygame.sprite.groupcollide(group1, group2, dokill1, dokill2)
+pygame.sprite.spritecollide(sprite, group, dokill)
+
+Collision Detection:
+# Rectangle collision
+rect1 = pygame.Rect(x1, y1, width1, height1)
+rect2 = pygame.Rect(x2, y2, width2, height2)
+if rect1.colliderect(rect2):
+    handle_collision()
+
+# Circle collision
+def circle_collision(pos1, radius1, pos2, radius2):
+    dx = pos1[0] - pos2[0]
+    dy = pos1[1] - pos2[1]
+    distance = (dx**2 + dy**2)**0.5
+    return distance < radius1 + radius2
+
+Timers:
+# Create custom event
+SPAWN_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(SPAWN_EVENT, 1000)  # Every 1000ms
+
+# Handle custom event
+for event in pygame.event.get():
+    if event.type == SPAWN_EVENT:
+        spawn_enemy()
+
+# Get time
+current_time = pygame.time.get_ticks()  # Milliseconds since pygame.init()
+
+Game States:
+class GameState:
+    MENU = 0
+    PLAYING = 1
+    PAUSED = 2
+    GAME_OVER = 3
+
+current_state = GameState.MENU
+
+def handle_menu_events(event):
+    # Handle menu events
+    pass
+
+def handle_playing_events(event):
+    # Handle playing events
+    pass
+
+# In main loop
+if current_state == GameState.MENU:
+    for event in pygame.event.get():
+        handle_menu_events(event)
+elif current_state == GameState.PLAYING:
+    for event in pygame.event.get():
+        handle_playing_events(event)
+
+Particle System:
+class Particle(pygame.sprite.Sprite):
+    def __init__(self, pos, velocity, color, lifetime):
+        super().__init__()
+        self.image = pygame.Surface((5, 5))
+        self.image.fill(color)
+        self.rect = self.image.get_rect(center=pos)
+        self.velocity = velocity
+        self.lifetime = lifetime
+        self.age = 0
+    
+    def update(self):
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+        self.age += 1
+        if self.age >= self.lifetime:
+            self.kill()
+
+# Create particles
+def create_explosion(pos):
+    for _ in range(20):
+        angle = random.uniform(0, 2 * math.pi)
+        speed = random.uniform(1, 5)
+        velocity = (math.cos(angle) * speed, math.sin(angle) * speed)
+        color = random.choice([RED, YELLOW, ORANGE])
+        particle = Particle(pos, velocity, color, 30)
+        particles.add(particle)
+
+Best Practices:
+- Use sprite classes for game objects
+- Organize code into separate files
+- Use constants for game settings
+- Implement proper game loop with FPS limiting
+- Handle events properly
+- Use sprite groups for efficient rendering
+- Implement proper collision detection
+- Use delta time for frame-independent movement
+- Test performance on target machines

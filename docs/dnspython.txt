@@ -1,0 +1,148 @@
+========================================
+БИБЛИОТЕКА: dnspython (dns)
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://www.dnspython.org/
+РЕПОЗИТОРИЙ: https://github.com/rthalley/dnspython
+
+ОПИСАНИЕ:
+Мощная библиотека для работы с DNS (Domain Name System).
+Поддерживает все типы DNS записей, асинхронные запросы, DNSSEC,
+и может использоваться как DNS клиент и сервер.
+
+ОСНОВНЫЕ МОДУЛИ:
+- dns.resolver: DNS клиент (запросы к DNS серверам)
+- dns.message: Создание и разбор DNS сообщений
+- dns.query: Отправка DNS запросов
+- dns.name: Работа с DNS именами
+- dns.zone: Работа с DNS зонами
+- dns.rdatatype: Типы ресурсных записей
+- dns.rdataclass: Классы ресурсных записей
+- dns.flags: Флаги DNS сообщений
+- dns.opcode: Операционные коды
+- dns.rcode: Коды ответов
+- dns.tsig: Поддержка TSIG аутентификации
+- dns.dnssec: Поддержка DNSSEC
+- dns.asyncresolver: Асинхронный резолвер
+
+ОСНОВНЫЕ ТИПЫ ЗАПИСЕЙ:
+- A: IPv4 адрес
+- AAAA: IPv6 адрес
+- CNAME: Каноническое имя (алиас)
+- MX: Mail exchange (почтовый сервер)
+- NS: Name server (сервер имен)
+- TXT: Текстовая запись
+- PTR: Указатель (reverse DNS)
+- SOA: Start of authority
+- SRV: Service record
+- CAA: Certification authority authorization
+- DS: Delegation signer
+- DNSKEY: DNS key (DNSSEC)
+- RRSIG: Resource record signature
+
+ОСНОВНЫЕ КЛАССЫ:
+- dns.resolver.Resolver: Класс резолвера
+- dns.resolver.Answer: Объект ответа
+- dns.message.Message: DNS сообщение
+- dns.name.Name: DNS имя
+- dns.zone.Zone: DNS зона
+
+ОСНОВНЫЕ МЕТОДЫ dns.resolver:
+- dns.resolver.resolve(qname, rdtype) - Выполнить DNS запрос
+- dns.resolver.resolve_address(ipaddr) - Reverse DNS (PTR)
+- resolver.nameservers - Список DNS серверов
+- resolver.timeout - Таймаут запроса
+- resolver.lifetime - Общее время ожидания
+
+ОСНОВНЫЕ МЕТОДЫ ответа:
+- answer.response - Полный DNS ответ
+- answer.rrset - Набор ресурсных записей
+- answer.ttl - Время жизни записи
+
+ИСКЛЮЧЕНИЯ:
+- dns.resolver.NXDOMAIN: Домен не существует
+- dns.resolver.NoAnswer: Нет ответа
+- dns.resolver.Timeout: Таймаут
+- dns.exception.DNSException: Базовое исключение
+
+УСТАНОВКА:
+pip install dnspython
+
+ПРИМЕР КОДА:
+import dns.resolver
+import dns.reversename
+import dns.query
+import dns.message
+
+# Простой A запрос
+try:
+    answers = dns.resolver.resolve('google.com', 'A')
+    for rdata in answers:
+        print(f'google.com A: {rdata.address}')
+except dns.resolver.NXDOMAIN:
+    print('Домен не существует')
+except dns.resolver.NoAnswer:
+    print('Нет записи A')
+except dns.resolver.Timeout:
+    print('Таймаут')
+
+# MX запрос
+answers = dns.resolver.resolve('google.com', 'MX')
+for rdata in answers:
+    print(f'MX: {rdata.exchange} приоритет {rdata.preference}')
+
+# TXT запрос
+answers = dns.resolver.resolve('google.com', 'TXT')
+for rdata in answers:
+    print(f'TXT: {rdata.strings}')
+
+# NS запрос
+answers = dns.resolver.resolve('google.com', 'NS')
+for rdata in answers:
+    print(f'NS: {rdata.target}')
+
+# Reverse DNS (PTR)
+addr = dns.reversename.from_address('8.8.8.8')
+answers = dns.resolver.resolve(addr, 'PTR')
+for rdata in answers:
+    print(f'PTR: {rdata.target}')
+
+# Использование кастомного DNS сервера
+resolver = dns.resolver.Resolver()
+resolver.nameservers = ['8.8.8.8', '1.1.1.1']
+resolver.timeout = 2
+resolver.lifetime = 5
+answers = resolver.resolve('yandex.ru', 'A')
+for rdata in answers:
+    print(f'yandex.ru: {rdata.address}')
+
+# Асинхронные запросы
+import asyncio
+import dns.asyncresolver
+
+async def query():
+    resolver = dns.asyncresolver.Resolver()
+    answers = await resolver.resolve('python.org', 'A')
+    for rdata in answers:
+        print(f'python.org A: {rdata.address}')
+
+asyncio.run(query())
+
+# Прямой DNS запрос с raw сообщением
+qname = dns.name.from_text('example.com')
+message = dns.message.make_query(qname, dns.rdatatype.A)
+response = dns.query.udp(message, '8.8.8.8', timeout=3)
+for answer in response.answer:
+    for item in answer:
+        if item.rdtype == dns.rdatatype.A:
+            print(f'Direct query: {item.address}')
+
+# Работа с зонами
+zone = dns.zone.from_file('example.com.zone', 'example.com')
+for name, node in zone.nodes.items():
+    rdset = node.get_rdataset(dns.rdataclass.IN, dns.rdatatype.A)
+    if rdset:
+        for rdata in rdset:
+            print(f'{name}: {rdata}')

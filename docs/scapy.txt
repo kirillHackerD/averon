@@ -1,0 +1,120 @@
+========================================
+БИБЛИОТЕКА: scapy
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://scapy.readthedocs.io/
+РЕПОЗИТОРИЙ: https://github.com/secdev/scapy
+
+ОПИСАНИЕ:
+Мощная библиотека для манипуляции сетевыми пакетами. Позволяет создавать,
+отправлять, перехватывать и анализировать сетевые пакеты различных протоколов.
+
+ОСНОВНЫЕ ВОЗМОЖНОСТИ:
+- Создание пакетов различных протоколов
+- Отправка и получение пакетов
+- Перехват и анализ трафика
+- Сканирование сети
+- Трассировка маршрута
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- send(packet) - Отправить пакет на 3 уровне (IP)
+- sendp(packet) - Отправить пакет на 2 уровне (Ethernet)
+- sr(packet) - Отправить и получить ответ (send-receive)
+- sr1(packet) - Отправить и получить первый ответ
+- sniff(count, filter, iface) - Перехват пакетов
+- wrpcap(filename, packets) - Сохранить пакеты в файл
+- rdpcap(filename) - Прочитать пакеты из файла
+- hexdump(packet) - Вывести пакет в hex-формате
+- ls() - Список доступных протоколов
+- lsc() - Список доступных команд
+
+ОСНОВНЫЕ ПРОТОКОЛЫ:
+- IP: IP пакет
+- TCP: TCP сегмент
+- UDP: UDP дейтаграмма
+- ICMP: ICMP пакет
+- Ether: Ethernet кадр
+- ARP: ARP пакет
+- DNS: DNS запрос/ответ
+- HTTP: HTTP пакет (через сторонние модули)
+
+ОСНОВНЫЕ МЕТОДЫ ПАКЕТОВ:
+- packet.show() - Показать структуру пакета
+- packet.summary() - Краткое описание
+- packet.haslayer(protocol) - Проверить наличие слоя
+- packet.getlayer(protocol) - Получить слой
+- packet[protocol].field - Доступ к полю
+
+УСТАНОВКА:
+# Базовая установка
+pip install scapy
+
+# Для полной функциональности (Linux)
+pip install scapy[complete]
+
+# На Windows требуется Npcap или WinPcap
+# Скачать с: https://npcap.com/
+
+ОСОБЫЕ ТРЕБОВАНИЯ:
+- Linux: Требуются права root для отправки и перехвата пакетов
+- Windows: Требуется Npcap или WinPcap с включенной опцией "Raw Socket"
+- macOS: Требуются права root
+
+ПРИМЕР КОДА:
+from scapy.all import *
+
+# Создание IP пакета
+packet = IP(dst="8.8.8.8") / ICMP() / "Hello"
+packet.show()
+
+# Отправка пакета
+send(packet)
+
+# Отправка и получение ответа (ping)
+response = sr1(IP(dst="8.8.8.8") / ICMP(), timeout=2)
+if response:
+    response.show()
+else:
+    print("Нет ответа")
+
+# Создание TCP пакета
+tcp_packet = IP(dst="example.com") / TCP(dport=80, flags="S")
+tcp_packet.show()
+
+# Перехват пакетов (10 пакетов на интерфейсе eth0)
+packets = sniff(iface="eth0", count=10)
+wrpcap("capture.pcap", packets)
+
+# Перехват с фильтром
+packets = sniff(filter="tcp port 80", count=5)
+for packet in packets:
+    print(packet.summary())
+
+# Анализ сохраненных пакетов
+packets = rdpcap("capture.pcap")
+for packet in packets:
+    if packet.haslayer(IP):
+        print(f"IP: {packet[IP].src} -> {packet[IP].dst}")
+
+# ARP сканирование
+arp_request = ARP(pdst="192.168.1.1/24")
+broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
+packet = broadcast / arp_request
+answered, unanswered = srp(packet, timeout=2, verbose=False)
+
+for sent, received in answered:
+    print(f"{received.psrc} - {received.hwsrc}")
+
+# Трассировка маршрута
+trace = traceroute("google.com")
+trace.graph()  # Отобразить график
+
+# Сканирование портов
+ports = [22, 80, 443]
+ans, unans = sr(IP(dst="192.168.1.1") / TCP(dport=ports, flags="S"), timeout=2)
+
+for sent, received in ans:
+    if received.haslayer(TCP) and received[TCP].flags == 18:  # SA флаги
+        print(f"Порт {received[TCP].sport} открыт")

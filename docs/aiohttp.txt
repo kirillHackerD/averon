@@ -1,0 +1,112 @@
+========================================
+БИБЛИОТЕКА: aiohttp
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.aiohttp.org/
+РЕПОЗИТОРИЙ: https://github.com/aio-libs/aiohttp
+
+ОПИСАНИЕ:
+Асинхронный HTTP клиент и сервер на основе asyncio.
+Позволяет выполнять множество HTTP запросов одновременно без блокировок.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- ClientSession: HTTP клиентская сессия
+- web.Application: HTTP серверное приложение
+- web.RouteTableDef: Определение маршрутов
+- ClientResponse: Ответ на клиентский запрос
+
+КЛИЕНТСКАЯ ЧАСТЬ:
+Основные методы ClientSession:
+- session.get(url, params=None, headers=None) - GET запрос
+- session.post(url, data=None, json=None) - POST запрос
+- session.put(url, data=None, json=None) - PUT запрос
+- session.delete(url) - DELETE запрос
+- session.patch(url, data=None, json=None) - PATCH запрос
+
+Методы ответа:
+- response.status - HTTP статус
+- response.headers - Заголовки ответа
+- response.text() - Получить ответ как текст
+- response.json() - Получить ответ как JSON
+- response.read() - Получить ответ как байты
+- response.content - Асинхронный поток
+
+СЕРВЕРНАЯ ЧАСТЬ:
+Декораторы маршрутов:
+- @app.get('/path') - Обработчик GET запросов
+- @app.post('/path') - Обработчик POST запросов
+- @app.put('/path') - Обработчик PUT запросов
+- @app.delete('/path') - Обработчик DELETE запросов
+
+Параметры обработчиков:
+- request: Объект запроса
+- request.query - Параметры GET запроса
+- request.headers - Заголовки запроса
+- request.json() - JSON тело запроса
+- request.text() - Текстовое тело запроса
+- request.form() - Данные формы
+
+ОСОБЕННОСТИ:
+- Поддержка WebSockets (клиент и сервер)
+- Поддержка прокси
+- Поддержка cookies
+- Поддержка сжатия (gzip, deflate, brotli)
+- Поддержка пула соединений
+- Поддержка SSL/TLS
+
+УСТАНОВКА:
+pip install aiohttp
+
+ПРИМЕР КОДА (КЛИЕНТ):
+import aiohttp
+import asyncio
+
+async def fetch_data():
+    async with aiohttp.ClientSession() as session:
+        # GET запрос
+        async with session.get('https://api.example.com/data') as response:
+            data = await response.json()
+            print(data)
+        
+        # POST запрос с JSON
+        async with session.post(
+            'https://api.example.com/create',
+            json={'name': 'test', 'value': 123}
+        ) as response:
+            result = await response.text()
+            print(result)
+        
+        # Несколько параллельных запросов
+        urls = ['https://api.example.com/1', 'https://api.example.com/2']
+        async with asyncio.TaskGroup() as tg:
+            for url in urls:
+                tg.create_task(fetch_one(session, url))
+
+async def fetch_one(session, url):
+    async with session.get(url) as response:
+        return await response.json()
+
+asyncio.run(fetch_data())
+
+ПРИМЕР КОДА (СЕРВЕР):
+from aiohttp import web
+
+async def handle_get(request):
+    name = request.query.get('name', 'Guest')
+    return web.Response(text=f'Hello, {name}!')
+
+async def handle_post(request):
+    data = await request.json()
+    return web.json_response({'status': 'ok', 'received': data})
+
+app = web.Application()
+app.add_routes([
+    web.get('/', handle_get),
+    web.post('/api', handle_post)
+])
+
+# Запуск: web.run_app(app, port=8080)
+# Или программно:
+# web.run_app(app, host='localhost', port=8080)

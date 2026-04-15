@@ -1,0 +1,57 @@
+========================================
+БИБЛИОТЕКА: termcolor
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://pypi.org/project/termcolor/
+РЕПОЗИТОРИЙ: https://github.com/termcolor/termcolor
+
+ОПИСАНИЕ:
+Библиотека для вывода цветного текста в терминал с использованием
+ANSI-кодов. Поддерживает цвета текста, фона и текстовые атрибуты.
+
+ОСНОВНЫЕ ФУНКЦИИ [citation:3]:
+- colored(text, color, on_color=None, attrs=None, no_color=None, force_color=None)
+- cprint(text, color, on_color=None, attrs=None, **kwargs) - печать цветного текста
+
+ЦВЕТА ТЕКСТА [citation:3]:
+grey, red, green, yellow, blue, magenta, cyan, white
+light_grey, light_red, light_green, light_yellow,
+light_blue, light_magenta, light_cyan
+
+ЦВЕТА ФОНА [citation:3]:
+on_grey, on_red, on_green, on_yellow, on_blue,
+on_magenta, on_cyan, on_white
+on_light_grey, on_light_red, on_light_green, on_light_yellow,
+on_light_blue, on_light_magenta, on_light_cyan
+
+АТРИБУТЫ [citation:3]:
+bold, dark, underline, blink, reverse, concealed, strike
+
+УПРАВЛЕНИЕ ЦВЕТОМ [citation:3]:
+- no_color=True: Отключить цвет
+- force_color=True: Принудительно включить цвет
+- ANSI_COLORS_DISABLED: Переменная окружения для отключения
+- NO_COLOR: Переменная окружения для отключения
+- FORCE_COLOR: Переменная окружения для принудительного включения
+
+УСТАНОВКА:
+pip install termcolor
+
+ПРИМЕР КОДА [citation:3]:
+from termcolor import colored, cprint
+
+# Цветной текст
+text = colored("Hello, World!", "red", attrs=["reverse", "blink"])
+print(text)
+
+# Цветной текст с фоном
+cprint("Hello, World!", "green", "on_red")
+
+# Жирный красный текст в stderr
+cprint("Attention!", "red", attrs=["bold"], file=sys.stderr)
+
+# Использование в цикле
+for i in range(10):
+    cprint(i, "magenta", end=" ")

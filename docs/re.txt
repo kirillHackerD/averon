@@ -1,0 +1,188 @@
+Re Module Documentation
+
+Regular expression operations for pattern matching. Built-in Python library.
+
+Basic Pattern Matching:
+import re
+
+# Search for pattern
+text = "Hello, my email is john@example.com"
+match = re.search(r'\w+@\w+\.\w+', text)
+if match:
+    print(match.group())  # john@example.com
+
+# Find all matches
+text = "Emails: alice@test.com, bob@test.com"
+emails = re.findall(r'\w+@\w+\.\w+', text)
+print(emails)  # ['alice@test.com', 'bob@test.com']
+
+# Match at start
+if re.match(r'Hello', text):
+    print("Starts with Hello")
+
+Common Patterns:
+
+# Email
+pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
+# Phone number (US)
+pattern = r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+
+# URL
+pattern = r'https?://(?:[-\w.])+(?:[:\d]+)?(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?'
+
+# IP Address
+pattern = r'\b(?:\d{1,3}\.){3}\d{1,3}\b'
+
+# Date (YYYY-MM-DD)
+pattern = r'\d{4}-\d{2}-\d{2}'
+
+Using Match Objects:
+import re
+
+text = "Name: John, Age: 30, City: New York"
+match = re.search(r'Name: (\w+), Age: (\d+)', text)
+
+if match:
+    print(match.group(0))   # Full match: Name: John, Age: 30
+    print(match.group(1))   # First group: John
+    print(match.group(2))   # Second group: 30
+    print(match.groups())   # All groups: ('John', '30')
+
+# Named groups
+text = "2024-03-15"
+match = re.search(r'(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})', text)
+if match:
+    print(match.group('year'))   # 2024
+    print(match.groupdict())     # {'year': '2024', 'month': '03', 'day': '15'}
+
+Substitution:
+import re
+
+# Replace pattern
+text = "Hello world, hello Python"
+result = re.sub(r'hello', 'Hi', text, flags=re.IGNORECASE)
+print(result)  # Hi world, Hi Python
+
+# Replace with function
+def double(match):
+    number = int(match.group())
+    return str(number * 2)
+
+text = "I have 5 apples and 3 oranges"
+result = re.sub(r'\d+', double, text)
+print(result)  # I have 10 apples and 6 oranges
+
+# Limit replacements
+result = re.sub(r'\w+', 'X', 'a b c d e', count=2)
+print(result)  # X X c d e
+
+Splitting:
+import re
+
+# Split by multiple delimiters
+text = "apple, banana; orange|grape"
+fruits = re.split(r'[,;|]\s*', text)
+print(fruits)  # ['apple', 'banana', 'orange', 'grape']
+
+Compilation:
+import re
+
+# Compile for reuse
+email_pattern = re.compile(r'\w+@\w+\.\w+')
+
+texts = ["Email me at test@test.com", "Contact: admin@site.org"]
+for text in texts:
+    match = email_pattern.search(text)
+    if match:
+        print(match.group())
+
+# Compiled with flags
+pattern = re.compile(r'hello', re.IGNORECASE)
+
+Flags:
+import re
+
+re.IGNORECASE    # Case-insensitive matching
+re.MULTILINE     # ^ and $ match each line
+re.DOTALL        # . matches newlines too
+re.UNICODE       # Unicode matching (default in Python 3)
+
+# Multiple flags
+pattern = re.compile(r'^hello', re.IGNORECASE | re.MULTILINE)
+
+Greedy vs Non-Greedy:
+import re
+
+text = "<div>Content 1</div><div>Content 2</div>"
+
+# Greedy (matches longest)
+greedy = re.findall(r'<div>.*</div>', text)
+print(greedy)  # ['<div>Content 1</div><div>Content 2</div>']
+
+# Non-greedy (matches shortest)
+non_greedy = re.findall(r'<div>.*?</div>', text)
+print(non_greedy)  # ['<div>Content 1</div>', '<div>Content 2</div>']
+
+Special Characters:
+.       - Any character except newline
+\d      - Digit (0-9)
+\D      - Non-digit
+\w      - Word character (alphanumeric + underscore)
+\W      - Non-word character
+\s      - Whitespace
+\S      - Non-whitespace
+^       - Start of string
+$       - End of string
+\b      - Word boundary
+\B      - Non-word boundary
+
+Quantifiers:
+*       - 0 or more
++       - 1 or more
+?       - 0 or 1
+{n}     - Exactly n
+{n,}    - n or more
+{n,m}   - Between n and m
+
+Groups and Alternation:
+import re
+
+# Grouping
+pattern = r'(\d{3})-(\d{3})-(\d{4})'
+
+# Alternation (OR)
+pattern = r'cat|dog'
+
+# Non-capturing group
+pattern = r'(?:Mr|Mrs|Ms)\.? (\w+)'
+
+# Lookahead (not captured)
+pattern = r'\d+(?= dollars)'
+
+# Negative lookahead
+pattern = r'\d+(?! dollars)'
+
+Validation Examples:
+import re
+
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return bool(re.match(pattern, email))
+
+def is_valid_phone(phone):
+    pattern = r'^\+?1?\d{9,15}$'
+    return bool(re.match(pattern, phone))
+
+def is_valid_url(url):
+    pattern = r'^https?://(?:[-\w.])+(?:[:\d]+)?(?:/(?:[\w/_.])*)?$'
+    return bool(re.match(pattern, url))
+
+Best Practices:
+- Use raw strings (r'pattern') for regex
+- Compile patterns when using multiple times
+- Use named groups for complex patterns
+- Be careful with greedy vs non-greedy
+- Test patterns with edge cases
+- Use re.escape() for literal strings
+- Handle None returns from match/search

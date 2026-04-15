@@ -1,0 +1,85 @@
+========================================
+БИБЛИОТЕКА: csv
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/csv.html
+
+ОПИСАНИЕ:
+Модуль для чтения и записи файлов в формате CSV (Comma Separated Values).
+Поддерживает различные диалекты и настройки форматирования.
+
+ОСНОВНЫЕ КЛАССЫ:
+- csv.reader: Чтение CSV файла построчно
+- csv.writer: Запись данных в CSV файл
+- csv.DictReader: Чтение CSV в виде словарей (первая строка - ключи)
+- csv.DictWriter: Запись словарей в CSV файл
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- csv.reader(file, delimiter=',', quotechar='"') - Создать reader
+- csv.writer(file, delimiter=',', quotechar='"') - Создать writer
+- csv.DictReader(file, fieldnames=None) - Создать DictReader
+- csv.DictWriter(file, fieldnames) - Создать DictWriter
+
+ОСНОВНЫЕ ПАРАМЕТРЫ:
+- delimiter: Разделитель полей (по умолчанию ',')
+- quotechar: Символ для цитирования полей (по умолчанию '"')
+- quoting: Режим цитирования (QUOTE_MINIMAL, QUOTE_ALL, QUOTE_NONNUMERIC, QUOTE_NONE)
+- escapechar: Символ экранирования
+- lineterminator: Символ конца строки
+- skipinitialspace: Пропускать пробелы после разделителя
+
+ДИАЛЕКТЫ:
+- excel: Стандартный диалект Excel (запятая, двойные кавычки)
+- excel-tab: Диалект Excel с табуляцией в качестве разделителя
+- unix: Диалект Unix (запятая, LF как конец строки)
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import csv
+
+# Запись CSV файла
+data = [
+    ["Имя", "Возраст", "Город"],
+    ["Иван", 25, "Москва"],
+    ["Мария", 30, "Санкт-Петербург"],
+    ["Петр", 28, "Новосибирск"]
+]
+
+with open('users.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+    writer.writerows(data)
+
+# Чтение CSV файла
+with open('users.csv', 'r', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(f"{row[0]} - {row[1]} лет, {row[2]}")
+
+# Запись с помощью DictWriter
+users = [
+    {"name": "Иван", "age": 25, "city": "Москва"},
+    {"name": "Мария", "age": 30, "city": "Санкт-Петербург"},
+    {"name": "Петр", "age": 28, "city": "Новосибирск"}
+]
+
+with open('users_dict.csv', 'w', newline='', encoding='utf-8') as f:
+    fieldnames = ["name", "age", "city"]
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(users)
+
+# Чтение с помощью DictReader
+with open('users_dict.csv', 'r', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(f"{row['name']} - {row['age']} лет, {row['city']}")
+
+# Работа с другими разделителями (табуляция)
+data = [["a", "b", "c"], ["1", "2", "3"]]
+with open('data.tsv', 'w', newline='') as f:
+    writer = csv.writer(f, delimiter='\t')
+    writer.writerows(data)

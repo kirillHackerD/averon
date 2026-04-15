@@ -1,0 +1,75 @@
+========================================
+БИБЛИОТЕКА: telebot (pyTelegramBotAPI)
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://pytba.readthedocs.io/
+РЕПОЗИТОРИЙ: https://github.com/eternnoir/pyTelegramBotAPI
+
+ОПИСАНИЕ:
+Библиотека для создания Telegram ботов с использованием Telegram Bot API.
+Простая и интуитивно понятная. Поддерживает синхронный и асинхронный режимы.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- TeleBot: Главный класс для работы с ботом
+- types: Модуль с типами данных (Message, CallbackQuery, InlineKeyboardMarkup)
+- util: Утилиты для работы (threaded, custom_filters)
+
+ОСНОВНЫЕ МЕТОДЫ TeleBot:
+- bot.send_message(chat_id, text) - Отправить сообщение
+- bot.send_photo(chat_id, photo) - Отправить фото
+- bot.send_document(chat_id, document) - Отправить документ
+- bot.send_sticker(chat_id, sticker) - Отправить стикер
+- bot.edit_message_text(text, chat_id, message_id) - Редактировать сообщение
+- bot.delete_message(chat_id, message_id) - Удалить сообщение
+- bot.answer_callback_query(callback_query_id, text) - Ответ на callback
+- bot.register_next_step_handler(message, callback) - Следующий шаг
+
+ОСНОВНЫЕ ДЕКОРАТОРЫ:
+- @bot.message_handler(commands=['start']) - Обработчик команд
+- @bot.message_handler(content_types=['text']) - Обработчик текста
+- @bot.callback_query_handler(func=lambda call: True) - Обработчик callback
+- @bot.message_handler(func=lambda message: True) - Обработчик всех сообщений
+
+КЛАВИАТУРЫ:
+- ReplyKeyboardMarkup: Обычная клавиатура (кнопки в интерфейсе)
+- InlineKeyboardMarkup: Inline-клавиатура (под сообщением)
+- ReplyKeyboardRemove: Удалить клавиатуру
+- ForceReply: Принудительный ответ
+
+ТИПЫ КЛАВИАТУР:
+- KeyboardButton: Кнопка обычной клавиатуры
+- InlineKeyboardButton: Кнопка inline-клавиатуры
+
+УСТАНОВКА:
+pip install pyTelegramBotAPI
+
+ПРИМЕР КОДА:
+import telebot
+from telebot import types
+
+bot = telebot.TeleBot('TOKEN')
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.reply_to(message, 'Привет!')
+
+@bot.message_handler(content_types=['text'])
+def echo(message):
+    bot.send_message(message.chat.id, message.text)
+
+# Inline клавиатура
+@bot.message_handler(commands=['menu'])
+def menu(message):
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton('Кнопка 1', callback_data='btn1')
+    btn2 = types.InlineKeyboardButton('Кнопка 2', callback_data='btn2')
+    markup.add(btn1, btn2)
+    bot.send_message(message.chat.id, 'Выберите:', reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback(call):
+    bot.answer_callback_query(call.id, f'Нажата {call.data}')
+
+bot.infinity_polling()

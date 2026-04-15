@@ -1,0 +1,160 @@
+Node.js Documentation
+
+Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+
+File System (fs) Module:
+const fs = require('fs');
+
+// Read file (async)
+fs.readFile('file.txt', 'utf8', (err, data) => {
+    if (err) throw err;
+    console.log(data);
+});
+
+// Read file (sync)
+const data = fs.readFileSync('file.txt', 'utf8');
+
+// Write file (async)
+fs.writeFile('file.txt', 'Hello World', 'utf8', (err) => {
+    if (err) throw err;
+    console.log('File saved');
+});
+
+// Write file (sync)
+fs.writeFileSync('file.txt', 'Hello World');
+
+// Check if file exists
+if (fs.existsSync('file.txt')) {
+    console.log('File exists');
+}
+
+// List directory contents
+fs.readdir('.', (err, files) => {
+    if (err) throw err;
+    console.log(files);
+});
+
+Path Module:
+const path = require('path');
+
+// Join paths
+const fullPath = path.join('/folder', 'subfolder', 'file.txt');
+
+// Get directory name
+const dir = path.dirname('/folder/file.txt'); // /folder
+
+// Get file name
+const file = path.basename('/folder/file.txt'); // file.txt
+
+// Get file extension
+const ext = path.extname('/folder/file.txt'); // .txt
+
+HTTP Module:
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello World');
+});
+
+server.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+
+Express.js Framework:
+const express = require('express');
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.static('public'));
+
+// Routes
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
+
+app.post('/api/data', (req, res) => {
+    const data = req.body;
+    res.json({ received: data });
+});
+
+// Start server
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+
+NPM (Node Package Manager):
+# Install package
+npm install express
+
+# Install globally
+npm install -g nodemon
+
+# Install as dev dependency
+npm install --save-dev jest
+
+# Update package
+npm update express
+
+# Uninstall package
+npm uninstall express
+
+# Run scripts
+npm start
+npm test
+
+package.json:
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "My Node.js application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}
+
+Modules:
+// CommonJS (default)
+const fs = require('fs');
+module.exports = myFunction;
+
+// ES Modules (use .mjs extension or "type": "module" in package.json)
+import fs from 'fs';
+export default myFunction;
+
+Async/Await:
+const fs = require('fs').promises;
+
+async function readFile() {
+    try {
+        const data = await fs.readFile('file.txt', 'utf8');
+        console.log(data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+Environment Variables:
+require('dotenv').config();
+
+const port = process.env.PORT || 3000;
+const dbUrl = process.env.DATABASE_URL;
+
+Best Practices:
+- Use async/await instead of callbacks
+- Handle errors properly
+- Use environment variables for configuration
+- Use process.exit() only in CLI tools
+- Use streams for large files
+- Validate input data
+- Use proper HTTP status codes

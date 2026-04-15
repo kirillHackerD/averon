@@ -1,0 +1,243 @@
+Logging Module Documentation
+
+Logging facility for Python. Built-in library for tracking events.
+
+Basic Logging:
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Log messages
+logging.debug('Debug message')
+logging.info('Info message')
+logging.warning('Warning message')
+logging.error('Error message')
+logging.critical('Critical message')
+
+Log Levels:
+DEBUG     - Detailed information
+INFO      - Confirmation that things are working
+WARNING   - Something unexpected happened
+ERROR     - Serious problem, couldn't do something
+CRITICAL  - Program may be unable to continue
+
+Logger Instances:
+import logging
+
+# Create logger
+logger = logging.getLogger('my_module')
+logger.setLevel(logging.DEBUG)
+
+# Log with logger
+logger.info('This is an info message')
+logger.error('Error occurred', exc_info=True)
+
+Handlers:
+import logging
+
+logger = logging.getLogger('my_app')
+logger.setLevel(logging.DEBUG)
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_formatter = logging.Formatter('%(levelname)s: %(message)s')
+console_handler.setFormatter(console_formatter)
+logger.addHandler(console_handler)
+
+# File handler
+file_handler = logging.FileHandler('app.log')
+file_handler.setLevel(logging.DEBUG)
+file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+
+# Now logger outputs to both console and file
+logger.info('Message to both handlers')
+
+Configuration Examples:
+
+# Basic config to file
+logging.basicConfig(
+    filename='app.log',
+    filemode='a',  # append mode
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+# With date format
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO
+)
+
+Format String Attributes:
+%(asctime)s       - Human-readable timestamp
+%(created)f       - Timestamp (time.time())
+%(filename)s      - Source file name
+%(funcName)s      - Function name
+%(levelname)s     - Log level name
+%(levelno)s       - Log level number
+%(lineno)d        - Source line number
+%(message)s       - The logged message
+%(module)s        - Module name
+%(name)s          - Logger name
+%(pathname)s      - Full path to source file
+%(process)d       - Process ID
+%(thread)d        - Thread ID
+%(threadName)s    - Thread name
+
+Rotating File Handler:
+import logging
+from logging.handlers import RotatingFileHandler
+
+logger = logging.getLogger('my_logger')
+logger.setLevel(logging.INFO)
+
+# Rotate at 10MB, keep 5 backups
+handler = RotatingFileHandler(
+    'app.log',
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5
+)
+logger.addHandler(handler)
+
+Timed Rotating Handler:
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+# Rotate daily
+handler = TimedRotatingFileHandler(
+    'app.log',
+    when='midnight',
+    interval=1,
+    backupCount=7
+)
+
+JSON Format:
+import logging
+import json
+
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        log_data = {
+            'time': self.formatTime(record),
+            'level': record.levelname,
+            'logger': record.name,
+            'message': record.getMessage()
+        }
+        return json.dumps(log_data)
+
+logger = logging.getLogger('json_logger')
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+logger.addHandler(handler)
+
+Exception Logging:
+import logging
+
+logger = logging.getLogger('my_app')
+
+try:
+    result = 1 / 0
+except Exception:
+    # Log exception with traceback
+    logger.exception('Division by zero error')
+    # Same as:
+    # logger.error('Division by zero error', exc_info=True)
+
+Filtering:
+import logging
+
+class LevelFilter(logging.Filter):
+    def __init__(self, level):
+        self.level = level
+    
+    def filter(self, record):
+        return record.levelno >= self.level
+
+handler = logging.StreamHandler()
+handler.addFilter(LevelFilter(logging.WARNING))
+logger.addHandler(handler)
+
+Configuration from Dictionary:
+import logging
+import logging.config
+
+config = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+            'level': 'INFO'
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'app.log',
+            'formatter': 'standard',
+            'level': 'DEBUG'
+        }
+    },
+    'loggers': {
+        'my_app': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False
+        }
+    }
+}
+
+logging.config.dictConfig(config)
+logger = logging.getLogger('my_app')
+
+Configuration from File (YAML):
+import logging
+import logging.config
+import yaml
+
+with open('logging.yaml', 'r') as f:
+    config = yaml.safe_load(f.read())
+    logging.config.dictConfig(config)
+
+Context with Extra Data:
+import logging
+
+logger = logging.getLogger('my_app')
+
+# Add extra context
+logger.info('User action', extra={
+    'user_id': 123,
+    'action': 'login',
+    'ip': '192.168.1.1'
+})
+
+# Custom formatter to include extras
+class ContextFormatter(logging.Formatter):
+    def format(self, record):
+        msg = super().format(record)
+        if hasattr(record, 'user_id'):
+            msg += f' [user={record.user_id}]'
+        return msg
+
+Best Practices:
+- Use logger instances instead of module-level functions
+- Set level on both logger and handlers
+- Don't log sensitive data (passwords, tokens)
+- Use appropriate log levels
+- Include contextual information
+- Configure logging once at application start
+- Use rotating handlers for long-running apps
+- Handle exceptions in logging gracefully
+- Use f-strings or % formatting (not both)

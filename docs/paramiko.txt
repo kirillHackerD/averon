@@ -1,0 +1,217 @@
+========================================
+БИБЛИОТЕКА: paramiko
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://www.paramiko.org/
+РЕПОЗИТОРИЙ: https://github.com/paramiko/paramiko
+
+ОПИСАНИЕ:
+Реализация протокола SSHv2 на Python. Позволяет подключаться к удаленным серверам,
+выполнять команды, передавать файлы (SFTP), управлять SSH-ключами и туннелями.
+
+ОСНОВНЫЕ КЛАССЫ:
+- SSHClient: Основной клиент для SSH подключений
+- AutoAddPolicy: Политика автоматического добавления хостов
+- WarningPolicy: Политика с предупреждением
+- RejectPolicy: Политика отклонения неизвестных хостов
+- Channel: Канал для выполнения команд
+- SFTPClient: Клиент для SFTP (передача файлов)
+- Transport: Низкоуровневый транспорт
+- RSAKey: RSA ключ
+- DSSKey: DSS ключ
+- ECDSAKey: ECDSA ключ
+- Ed25519Key: Ed25519 ключ
+
+ОСНОВНЫЕ МЕТОДЫ SSHClient:
+- client.connect(hostname, port, username, password, pkey) - Подключение
+- client.exec_command(command) - Выполнить команду
+- client.invoke_shell() - Интерактивная сессия
+- client.open_sftp() - Открыть SFTP сессию
+- client.load_system_host_keys() - Загрузить системные ключи
+- client.set_missing_host_key_policy(policy) - Установить политику
+- client.close() - Закрыть соединение
+
+ОСНОВНЫЕ МЕТОДЫ SFTPClient:
+- sftp.put(localpath, remotepath) - Загрузить файл
+- sftp.get(remotepath, localpath) - Скачать файл
+- sftp.listdir(path) - Список файлов
+- sftp.mkdir(path) - Создать директорию
+- sftp.remove(path) - Удалить файл
+- sftp.rmdir(path) - Удалить директорию
+- sftp.rename(oldpath, newpath) - Переименовать
+- sftp.stat(path) - Информация о файле
+- sftp.chmod(path, mode) - Изменить права
+
+ОСНОВНЫЕ МЕТОДЫ Channel:
+- channel.send(data) - Отправить данные
+- channel.recv(size) - Получить данные
+- channel.recv_exit_status() - Получить код выхода
+- channel.close() - Закрыть канал
+
+ТИПЫ КЛЮЧЕЙ:
+- paramiko.RSAKey.generate(bits) - Сгенерировать RSA ключ
+- paramiko.RSAKey.from_private_key_file(filename) - Загрузить из файла
+
+УСТАНОВКА:
+pip install paramiko
+
+ПРИМЕР КОДА:
+import paramiko
+import os
+
+# ПРОСТОЕ ПОДКЛЮЧЕНИЕ
+client = paramiko.SSHClient()
+
+# Автоматическое добавление неизвестных хостов
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+# Подключение
+try:
+    client.connect(
+        hostname='192.168.1.100',
+        username='user',
+        password='password',
+        port=22,
+        timeout=10
+    )
+    print("Подключение установлено")
+    
+    # Выполнение команды
+    stdin, stdout, stderr = client.exec_command('ls -la')
+    
+    # Чтение вывода
+    print("STDOUT:")
+    for line in stdout:
+        print(line.strip())
+    
+    print("STDERR:")
+    for line in stderr:
+        print(line.strip())
+    
+    # Получение кода выхода
+    exit_status = stdout.channel.recv_exit_status()
+    print(f"Exit status: {exit_status}")
+    
+except paramiko.AuthenticationException:
+    print("Ошибка аутентификации")
+except paramiko.SSHException as e:
+    print(f"SSH ошибка: {e}")
+except Exception as e:
+    print(f"Ошибка: {e}")
+finally:
+    client.close()
+
+# ПОДКЛЮЧЕНИЕ ПО SSH КЛЮЧУ
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+# Загрузка приватного ключа
+private_key = paramiko.RSAKey.from_private_key_file('/home/user/.ssh/id_rsa')
+
+client.connect(
+    hostname='192.168.1.100',
+    username='user',
+    pkey=private_key
+)
+
+# Выполнение нескольких команд
+commands = ['uname -a', 'whoami', 'pwd']
+for cmd in commands:
+    stdin, stdout, stderr = client.exec_command(cmd)
+    output = stdout.read().decode()
+    print(f"\n{cmd}: {output.strip()}")
+
+client.close()
+
+# SFTP ПЕРЕДАЧА ФАЙЛОВ
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect('192.168.1.100', username='user', password='password')
+
+# Открытие SFTP сессии
+sftp = client.open_sftp()
+
+# Загрузка файла
+sftp.put('local_file.txt', '/remote/path/file.txt')
+print("Файл загружен")
+
+# Скачивание файла
+sftp.get('/remote/path/file.txt', 'downloaded_file.txt')
+print("Файл скачан")
+
+# Работа с директориями
+print(f"Содержимое /home/user: {sftp.listdir('/home/user')}")
+
+# Создание директории
+try:
+    sftp.mkdir('/home/user/new_dir')
+    print("Директория создана")
+except:
+    print("Директория уже существует")
+
+# Информация о файле
+stat = sftp.stat('/remote/path/file.txt')
+print(f"Размер: {stat.st_size} байт")
+print(f"Права: {oct(stat.st_mode)[-3:]}")
+
+sftp.close()
+client.close()
+
+# ИНТЕРАКТИВНАЯ СЕССИЯ
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect('192.168.1.100', username='user', password='password')
+
+# Интерактивная оболочка
+channel = client.invoke_shell()
+
+# Отправка команд
+channel.send('ls -la\n')
+channel.send('pwd\n')
+channel.send('exit\n')
+
+# Чтение вывода
+while not channel.recv_ready():
+    import time
+    time.sleep(0.5)
+
+output = channel.recv(4096).decode()
+print(output)
+
+client.close()
+
+# ПЕРЕДАЧА ФАЙЛА ПОТОЧНО
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect('192.168.1.100', username='user', password='password')
+
+sftp = client.open_sftp()
+
+# Потоковая загрузка
+with sftp.open('/remote/path/large_file.txt', 'w') as remote_file:
+    with open('local_large_file.txt', 'rb') as local_file:
+        while chunk := local_file.read(8192):
+            remote_file.write(chunk)
+
+print("Файл передан потоково")
+
+sftp.close()
+client.close()
+
+# ИСПОЛЬЗОВАНИЕ SSH АГЕНТА
+from paramiko.agent import Agent
+
+agent = Agent()
+keys = agent.get_keys()
+
+if keys:
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect('192.168.1.100', username='user')
+    
+    stdin, stdout, stderr = client.exec_command('hostname')
+    print(stdout.read().decode())
+    
+    client.close()

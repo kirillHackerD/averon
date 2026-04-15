@@ -1,0 +1,188 @@
+========================================
+БИБЛИОТЕКА: tqdm
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://tqdm.github.io/
+РЕПОЗИТОРИЙ: https://github.com/tqdm/tqdm
+
+ОПИСАНИЕ:
+Библиотека для создания прогресс-баров в консоли. Поддерживает вложенные прогресс-бары,
+автоматическое определение скорости выполнения, оставшегося времени и многое другое.
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- tqdm(iterable, **kwargs) - Обертка для итератора
+- trange(n, **kwargs) - Обертка для range()
+- tqdm.pandas() - Интеграция с pandas (progress_apply)
+- tqdm.write(message) - Безопасный вывод текста
+
+ОСНОВНЫЕ ПАРАМЕТРЫ:
+- desc: Описание (строка)
+- total: Общее количество итераций
+- unit: Единица измерения (по умолчанию "it")
+- unit_scale: Масштабирование единиц (1000 -> 1k)
+- unit_divisor: Делитель для масштабирования (по умолчанию 1000)
+- leave: Оставлять прогресс-бар после завершения
+- ncols: Ширина прогресс-бара
+- mininterval: Минимальный интервал обновления (сек)
+- maxinterval: Максимальный интервал обновления (сек)
+- miniters: Минимальное количество итераций между обновлениями
+- position: Позиция для вложенных баров
+- colour: Цвет прогресс-бара
+- bar_format: Пользовательский формат отображения
+- disable: Отключить прогресс-бар
+- smoothing: Сглаживание для оценки времени
+- initial: Начальное значение прогресса
+
+ФОРМАТИРОВАНИЕ bar_format:
+- {l_bar}: Левая часть
+- {bar}: Сам прогресс-бар
+- {r_bar}: Правая часть
+- {n}: Текущее значение
+- {total}: Общее значение
+- {percentage}: Процент завершения
+- {rate_fmt}: Скорость выполнения
+- {elapsed}: Прошедшее время
+- {remaining}: Оставшееся время
+- {desc}: Описание
+
+УСТАНОВКА:
+pip install tqdm
+
+ПРИМЕР КОДА:
+import time
+from tqdm import tqdm, trange
+from tqdm.contrib import tzip, tenumerate
+
+# БАЗОВОЕ ИСПОЛЬЗОВАНИЕ
+# Простой прогресс-бар
+for i in tqdm(range(100)):
+    time.sleep(0.01)
+
+# С описанием
+for i in tqdm(range(100), desc="Обработка"):
+    time.sleep(0.01)
+
+# С указанием total
+items = [1, 2, 3, 4, 5]
+for item in tqdm(items, total=len(items)):
+    time.sleep(0.5)
+
+# trange (сокращение для tqdm(range(n)))
+for i in trange(100, desc="Цикл"):
+    time.sleep(0.01)
+
+# РУЧНОЕ УПРАВЛЕНИЕ
+with tqdm(total=100) as pbar:
+    for i in range(10):
+        time.sleep(0.1)
+        pbar.update(10)  # +10 прогресса
+
+# Обновление с установкой значения
+with tqdm(total=100) as pbar:
+    for i in range(100):
+        time.sleep(0.01)
+        pbar.update(1)
+        if i == 50:
+            pbar.set_description("Половина выполнена")
+            pbar.set_postfix(status="50%")
+
+# POSTFIX (дополнительная информация)
+with tqdm(total=100, desc="Загрузка") as pbar:
+    for i in range(100):
+        time.sleep(0.01)
+        pbar.update(1)
+        pbar.set_postfix(speed=f"{i}%", status="OK")
+
+# ВЛОЖЕННЫЕ ПРОГРЕСС-БАРЫ
+for i in trange(3, desc="Внешний цикл"):
+    for j in tqdm(range(50), desc="Внутренний", leave=False):
+        time.sleep(0.01)
+
+# РАБОТА СО СПИСКАМИ
+# Список с индексами
+for i, item in tenumerate(range(100), desc="Индексы"):
+    time.sleep(0.01)
+
+# Параллельная итерация
+for a, b in tzip(range(50), range(50, 100), desc="Параллельно"):
+    time.sleep(0.01)
+
+# ИНТЕГРАЦИЯ С PANDAS
+import pandas as pd
+
+tqdm.pandas(desc="Pandas прогресс")
+
+df = pd.DataFrame({'A': range(1000)})
+
+# apply с прогресс-баром
+df['B'] = df['A'].progress_apply(lambda x: x ** 2)
+
+# applymap
+df.progress_applymap(lambda x: x * 2)
+
+# groupby
+df.groupby('A').progress_apply(lambda x: x.sum())
+
+# КАСТОМНЫЙ ФОРМАТ
+format = "{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
+for i in tqdm(range(100), bar_format=format, desc="Кастомный"):
+    time.sleep(0.01)
+
+# БЕЗ ОСТАВЛЕНИЯ БАРА
+for i in tqdm(range(100), leave=False):
+    time.sleep(0.01)
+
+# ОТКЛЮЧЕНИЕ ПРОГРЕСС-БАРА
+for i in tqdm(range(100), disable=True):
+    time.sleep(0.01)
+
+# РАБОТА С КОЛЛЕКЦИЯМИ
+# Словарь
+my_dict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5}
+for key, value in tqdm(my_dict.items(), desc="Словарь"):
+    time.sleep(0.1)
+
+# Строка
+for char in tqdm("Hello World", desc="Символы"):
+    time.sleep(0.05)
+
+# ЧТЕНИЕ ФАЙЛА
+def read_file_with_progress(filename):
+    with open(filename, 'rb') as f:
+        total = os.path.getsize(filename)
+        with tqdm(total=total, unit='B', unit_scale=True, desc="Чтение") as pbar:
+            while True:
+                chunk = f.read(8192)
+                if not chunk:
+                    break
+                pbar.update(len(chunk))
+                # Обработка чанка
+                process_chunk(chunk)
+
+# ЗАПИСЬ ФАЙЛА
+def write_file_with_progress(data, filename):
+    with open(filename, 'wb') as f:
+        with tqdm(total=len(data), unit='B', unit_scale=True, desc="Запись") as pbar:
+            for chunk in data:
+                f.write(chunk)
+                pbar.update(len(chunk))
+
+# БЕЗОПАСНЫЙ ВЫВОД
+for i in tqdm(range(10)):
+    time.sleep(0.2)
+    tqdm.write(f"Итерация {i} завершена")  # Безопасный вывод
+
+# ПОЛЬЗОВАТЕЛЬСКИЕ ЕДИНИЦЫ
+for i in tqdm(range(1000), unit='байт', unit_scale=True):
+    time.sleep(0.0001)
+
+for i in tqdm(range(1000), unit='запись', unit_scale=False):
+    time.sleep(0.0001)
+
+# ЦВЕТА
+for i in tqdm(range(100), colour='green'):
+    time.sleep(0.01)
+
+# Доступные цвета: red, green, blue, yellow, magenta, cyan, white

@@ -1,0 +1,80 @@
+========================================
+БИБЛИОТЕКА: aiosqlite
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://aiosqlite.omnilib.dev/
+РЕПОЗИТОРИЙ: https://github.com/omnilib/aiosqlite
+
+ОПИСАНИЕ:
+Асинхронная обертка над sqlite3 для использования с asyncio.
+Позволяет выполнять операции с SQLite без блокировки event loop.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- Connection: Асинхронное подключение к базе данных
+- Cursor: Асинхронный курсор для выполнения запросов
+- Row: Row-объект для доступа по имени колонки
+
+ОСНОВНЫЕ МЕТОДЫ:
+- aiosqlite.connect(database) - Асинхронное подключение к БД
+- connection.execute(sql, parameters) - Выполнить запрос
+- connection.executemany(sql, parameters) - Выполнить множество запросов
+- connection.executescript(sql_script) - Выполнить SQL скрипт
+- connection.commit() - Зафиксировать изменения
+- connection.rollback() - Откатить изменения
+- connection.close() - Закрыть соединение
+- cursor.fetchone() - Получить одну строку
+- cursor.fetchall() - Получить все строки
+- cursor.fetchmany(size) - Получить указанное количество строк
+
+КОНТЕКСТНЫЙ МЕНЕДЖЕР:
+- async with aiosqlite.connect(path) as db: - Автоматическое закрытие
+- async with db.execute(sql) as cursor: - Автоматическое закрытие курсора
+
+ОСОБЕННОСТИ:
+- Полная совместимость с API sqlite3
+- Поддержка Row-объектов для доступа по имени колонки
+- Поддержка транзакций
+- Поддержка пользовательских функций и агрегатов
+- Поддержка пула соединений (через сторонние библиотеки)
+
+УСТАНОВКА:
+pip install aiosqlite
+
+ПРИМЕР КОДА:
+import aiosqlite
+import asyncio
+
+async def main():
+    # Подключение к БД
+    async with aiosqlite.connect('database.db') as db:
+        # Создание таблицы
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                age INTEGER
+            )
+        ''')
+        await db.commit()
+        
+        # Вставка данных
+        await db.execute(
+            'INSERT INTO users (name, age) VALUES (?, ?)',
+            ('Иван', 25)
+        )
+        await db.commit()
+        
+        # Выборка данных
+        async with db.execute('SELECT * FROM users') as cursor:
+            async for row in cursor:
+                print(f'ID: {row[0]}, Name: {row[1]}, Age: {row[2]}')
+        
+        # Выборка с Row-объектом
+        db.row_factory = aiosqlite.Row
+        async with db.execute('SELECT * FROM users') as cursor:
+            row = await cursor.fetchone()
+            print(f'Name: {row["name"]}')
+
+asyncio.run(main())

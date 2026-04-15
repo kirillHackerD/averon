@@ -1,0 +1,171 @@
+========================================
+БИБЛИОТЕКА: random
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/random.html
+
+ОПИСАНИЕ:
+Модуль для генерации псевдослучайных чисел. Предоставляет функции для
+генерации случайных чисел, выбора случайных элементов из последовательностей,
+перемешивания и т.д. Основан на Mersenne Twister алгоритме.
+
+ОСНОВНЫЕ ФУНКЦИИ:
+
+ЧИСЛОВЫЕ ФУНКЦИИ:
+- random.random() - Случайное float в [0.0, 1.0)
+- random.uniform(a, b) - Случайное float в [a, b]
+- random.randint(a, b) - Случайное целое в [a, b]
+- random.randrange(stop) - Случайное целое в [0, stop)
+- random.randrange(start, stop, step) - Случайное целое с шагом
+- random.gauss(mu, sigma) - Нормальное распределение
+- random.normalvariate(mu, sigma) - Нормальное распределение
+- random.expovariate(lambd) - Экспоненциальное распределение
+- random.betavariate(alpha, beta) - Бета-распределение
+- random.gammavariate(alpha, beta) - Гамма-распределение
+- random.lognormvariate(mu, sigma) - Логнормальное распределение
+- random.paretovariate(alpha) - Распределение Парето
+- random.triangular(low, high, mode) - Треугольное распределение
+- random.vonmisesvariate(mu, kappa) - Распределение фон Мизеса
+- random.weibullvariate(alpha, beta) - Распределение Вейбулла
+
+ФУНКЦИИ ДЛЯ ПОСЛЕДОВАТЕЛЬНОСТЕЙ:
+- random.choice(seq) - Случайный элемент из последовательности
+- random.choices(population, weights, k) - Несколько элементов с весами
+- random.sample(population, k) - Уникальные случайные элементы
+- random.shuffle(seq) - Перемешивание последовательности (на месте)
+
+ГЕНЕРАТОРЫ:
+- random.seed(a=None) - Инициализация генератора
+- random.getstate() - Получить состояние генератора
+- random.setstate(state) - Восстановить состояние
+- random.getrandbits(k) - Случайное число с k битами
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import random
+import string
+
+# ИНИЦИАЛИЗАЦИЯ ГЕНЕРАТОРА
+random.seed(42)  # Фиксированное начальное число
+print(f"Случайное с seed=42: {random.random()}")
+
+random.seed()  # Использовать системное время
+
+# БАЗОВЫЕ СЛУЧАЙНЫЕ ЧИСЛА
+print(f"random(): {random.random()}")
+print(f"uniform(10, 20): {random.uniform(10, 20)}")
+print(f"randint(1, 100): {random.randint(1, 100)}")
+print(f"randrange(0, 100, 5): {random.randrange(0, 100, 5)}")
+
+# РАБОТА СО СПИСКАМИ
+my_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Случайный элемент
+print(f"choice: {random.choice(my_list)}")
+
+# Несколько элементов с повторениями
+print(f"choices (k=5): {random.choices(my_list, k=5)}")
+
+# Уникальные элементы
+print(f"sample (k=5): {random.sample(my_list, k=5)}")
+
+# Перемешивание
+random.shuffle(my_list)
+print(f"shuffled: {my_list}")
+
+# ВЕСА
+items = ['red', 'green', 'blue']
+weights = [0.7, 0.2, 0.1]  # 70%, 20%, 10%
+print(f"weighted choice: {random.choices(items, weights=weights, k=10)}")
+
+# СТРОКИ И СИМВОЛЫ
+# Случайный символ
+print(f"random char: {random.choice(string.ascii_letters)}")
+
+# Случайная строка
+def random_string(length):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+print(f"random string (10): {random_string(10)}")
+
+# ГЕНЕРАЦИЯ ПАРОЛЯ
+def generate_password(length=12):
+    chars = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(chars) for _ in range(length))
+
+print(f"password: {generate_password(16)}")
+
+# РАСПРЕДЕЛЕНИЯ
+print(f"\n=== РАСПРЕДЕЛЕНИЯ ===")
+print(f"gauss(0, 1): {random.gauss(0, 1)}")
+print(f"normalvariate(0, 1): {random.normalvariate(0, 1)}")
+print(f"expovariate(0.5): {random.expovariate(0.5)}")
+print(f"betavariate(2, 5): {random.betavariate(2, 5)}")
+print(f"triangular(0, 10, 5): {random.triangular(0, 10, 5)}")
+
+# ГЕНЕРАЦИЯ СЛУЧАЙНЫХ ДАННЫХ
+# Случайные IP адреса
+def random_ip():
+    return f"{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}"
+
+print(f"random IP: {random_ip()}")
+
+# Случайные цвета (HEX)
+def random_color():
+    return f"#{random.randint(0, 0xFFFFFF):06x}"
+
+print(f"random color: {random_color()}")
+
+# Случайные координаты
+def random_coordinates():
+    lat = random.uniform(-90, 90)
+    lon = random.uniform(-180, 180)
+    return (lat, lon)
+
+print(f"random coordinates: {random_coordinates()}")
+
+# СЛУЧАЙНЫЙ ВЫБОР С ВЕРОЯТНОСТЯМИ
+def weighted_choice(items, weights):
+    return random.choices(items, weights=weights)[0]
+
+items = ['A', 'B', 'C']
+weights = [0.5, 0.3, 0.2]
+print(f"weighted choice: {weighted_choice(items, weights)}")
+
+# СОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ СОСТОЯНИЯ
+state = random.getstate()
+print(f"random: {random.random()}")
+print(f"random: {random.random()}")
+
+random.setstate(state)  # Возврат к предыдущему состоянию
+print(f"после restore: {random.random()}")
+print(f"после restore: {random.random()}")
+
+# ГЕНЕРАЦИЯ СЛУЧАЙНЫХ ДАТ
+from datetime import datetime, timedelta
+
+def random_date(start, end):
+    delta = end - start
+    random_days = random.randint(0, delta.days)
+    return start + timedelta(days=random_days)
+
+start_date = datetime(2020, 1, 1)
+end_date = datetime(2024, 12, 31)
+print(f"random date: {random_date(start_date, end_date).date()}")
+
+# СЛУЧАЙНЫЙ ЭЛЕМЕНТ ИЗ ФАЙЛА
+def random_line(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+        return random.choice(lines).strip() if lines else None
+
+# СЛУЧАЙНОЕ ЦЕЛОЕ С КОНТРОЛИРУЕМЫМ РАСПРЕДЕЛЕНИЕМ
+def biased_randint(low, high, bias_center):
+    """Генерация с смещением к центру"""
+    return int(random.triangular(low, high, bias_center))
+
+print(f"biased int: {biased_randint(0, 100, 50)}")

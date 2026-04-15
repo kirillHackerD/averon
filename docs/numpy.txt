@@ -1,0 +1,203 @@
+NumPy Documentation
+
+NumPy is the fundamental package for scientific computing in Python.
+
+Basic Import:
+import numpy as np
+
+Creating Arrays:
+# From Python lists
+arr = np.array([1, 2, 3, 4, 5])
+arr2d = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Special arrays
+np.zeros(5)              # [0. 0. 0. 0. 0.]
+np.ones((2, 3))          # [[1. 1. 1.], [1. 1. 1.]]
+np.full((2, 2), 7)       # [[7, 7], [7, 7]]
+np.eye(3)                # Identity matrix
+np.random.random((2, 3)) # Random values
+
+# Ranges
+np.arange(10)            # [0 1 2 3 4 5 6 7 8 9]
+np.arange(0, 10, 2)      # [0 2 4 6 8]
+np.linspace(0, 1, 5)     # [0.   0.25 0.5  0.75 1.  ]
+
+Array Properties:
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+
+arr.ndim          # Number of dimensions (2)
+arr.shape         # Shape (2, 3)
+arr.size          # Total elements (6)
+arr.dtype         # Data type (int64)
+arr.itemsize      # Size of each element in bytes
+
+Array Operations:
+# Arithmetic
+arr + 5
+arr * 2
+arr1 + arr2
+arr1 * arr2        # Element-wise multiplication
+
+# Mathematical functions
+np.sqrt(arr)
+np.exp(arr)
+np.log(arr)
+np.sin(arr)
+np.cos(arr)
+
+# Statistical
+arr.mean()
+arr.std()
+arr.var()
+arr.min()
+arr.max()
+arr.sum()
+
+Indexing and Slicing:
+# 1D arrays
+arr = np.array([0, 1, 2, 3, 4, 5])
+arr[2]              # 2
+arr[2:5]            # [2, 3, 4]
+arr[::2]            # [0, 2, 4]
+
+# 2D arrays
+arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+arr2d[1, 2]         # 6 (row 1, column 2)
+arr2d[0]            # [1, 2, 3] (first row)
+arr2d[:, 1]         # [2, 5, 8] (second column)
+arr2d[0:2, 1:3]     # [[2, 3], [5, 6]]
+
+Boolean Indexing:
+arr = np.array([1, 2, 3, 4, 5])
+mask = arr > 3
+arr[mask]           # [4, 5]
+
+arr[arr % 2 == 0]   # [2, 4]
+
+Reshaping:
+arr = np.arange(6)
+arr.reshape(2, 3)   # [[0, 1, 2], [3, 4, 5]]
+arr.reshape(3, 2)   # [[0, 1], [2, 3], [4, 5]]
+
+# Transpose
+arr.T
+
+# Flatten
+arr.flatten()
+
+Array Manipulation:
+# Concatenation
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+np.concatenate([a, b])  # [1, 2, 3, 4, 5, 6]
+
+# Stacking
+np.vstack([a, b])      # Vertical stack
+np.hstack([a, b])      # Horizontal stack
+
+# Splitting
+arr = np.arange(9)
+np.split(arr, 3)       # [array([0, 1, 2]), array([3, 4, 5]), array([6, 7, 8])]
+
+Linear Algebra:
+# Matrix multiplication
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])
+np.dot(a, b)           # or a @ b
+
+# Determinant
+np.linalg.det(a)
+
+# Inverse
+np.linalg.inv(a)
+
+# Eigenvalues
+np.linalg.eig(a)
+
+# Solve linear system
+A = np.array([[3, 1], [1, 2]])
+b = np.array([9, 8])
+x = np.linalg.solve(A, b)  # [2., 3.]
+
+Data Types:
+# Specify dtype
+arr = np.array([1, 2, 3], dtype=np.float32)
+arr = np.array(['a', 'b', 'c'], dtype='<U1')
+
+# Type conversion
+arr.astype(np.float64)
+arr.astype(str)
+
+# Common dtypes
+np.int32, np.int64
+np.float32, np.float64
+np.complex64, np.complex128
+np.bool_
+np.object_
+
+Random Numbers:
+# Random integers
+np.random.randint(0, 10, size=5)
+np.random.randint(0, 100, size=(3, 3))
+
+# Random floats
+np.random.random(5)
+np.random.random((2, 3))
+
+# Normal distribution
+np.random.normal(0, 1, 1000)  # mean=0, std=1
+
+# Set seed
+np.random.seed(42)
+
+File I/O:
+# Save arrays
+np.save('array.npy', arr)
+np.savez('arrays.npz', a=arr1, b=arr2)
+
+# Load arrays
+arr = np.load('array.npy')
+data = np.load('arrays.npz')
+arr1 = data['a']
+arr2 = data['b']
+
+# Text files
+np.savetxt('array.txt', arr)
+arr = np.loadtxt('array.txt')
+
+Broadcasting:
+# Different shapes can be combined
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+row = np.array([10, 20, 30])
+arr + row  # Adds row to each row of arr
+
+Universal Functions (ufuncs):
+# Apply functions element-wise
+np.add(arr1, arr2)
+np.multiply(arr1, arr2)
+np.maximum(arr1, arr2)
+np.minimum(arr1, arr2)
+
+Performance Tips:
+- Use vectorized operations instead of loops
+- Use appropriate data types
+- Pre-allocate arrays when possible
+- Use views instead of copies when possible
+- Use built-in functions instead of Python equivalents
+
+Common Patterns:
+# Replace values
+arr[arr < 0] = 0
+
+# Count elements
+np.sum(arr > 5)
+
+# Unique values
+np.unique(arr)
+
+# Sort
+np.sort(arr)
+arr.sort()  # In-place
+
+# Percentiles
+np.percentile(arr, [25, 50, 75])

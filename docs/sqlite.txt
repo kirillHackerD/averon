@@ -1,0 +1,65 @@
+SQLite Documentation
+
+SQLite is a C library that provides a lightweight disk-based database. It doesn't require a separate server process.
+
+Basic Usage:
+import sqlite3
+
+# Connect to database
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+
+# Create table
+cursor.execute('''
+    CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE
+    )
+''')
+
+# Insert data
+cursor.execute('INSERT INTO users (name, email) VALUES (?, ?)', 
+               ('John Doe', 'john@example.com'))
+
+# Query data
+cursor.execute('SELECT * FROM users')
+rows = cursor.fetchall()
+
+for row in rows:
+    print(row)
+
+# Update data
+cursor.execute('UPDATE users SET email = ? WHERE id = ?', 
+               ('newemail@example.com', 1))
+
+# Delete data
+cursor.execute('DELETE FROM users WHERE id = ?', (1,))
+
+# Commit and close
+conn.commit()
+conn.close()
+
+Key Points:
+- Always use parameterized queries (?) to prevent SQL injection
+- Call conn.commit() to save changes
+- Use cursor.fetchone() for single row
+- Use cursor.fetchall() for all rows
+- Use with statement for automatic closing:
+
+with sqlite3.connect('database.db') as conn:
+    cursor = conn.cursor()
+    # Database operations here
+
+Common Operations:
+- WHERE clause: cursor.execute('SELECT * FROM users WHERE name = ?', ('John',))
+- ORDER BY: cursor.execute('SELECT * FROM users ORDER BY name DESC')
+- LIMIT: cursor.execute('SELECT * FROM users LIMIT 10')
+- COUNT: cursor.execute('SELECT COUNT(*) FROM users')
+
+Data Types:
+- INTEGER: Whole numbers
+- TEXT: Strings
+- REAL: Floating point numbers
+- BLOB: Binary data
+- NULL: Null values

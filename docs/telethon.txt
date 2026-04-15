@@ -1,0 +1,120 @@
+========================================
+БИБЛИОТЕКА: Telethon
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.telethon.dev/
+РЕПОЗИТОРИЙ: https://github.com/LonamiWebs/Telethon
+
+ОПИСАНИЕ:
+Полнофункциональная асинхронная библиотека для взаимодействия с Telegram API.
+Реализует MTProto протокол. Позволяет работать как от имени пользователя,
+так и от имени бота (альтернатива Bot API) [citation:2][citation:4][citation:10].
+
+ОСНОВНЫЕ КЛАССЫ:
+- TelegramClient: Главный класс клиента для работы с Telegram
+- events: Модуль с событиями (NewMessage, CallbackQuery и др.)
+- types: Типы данных Telegram (Message, User, Chat и др.)
+- errors: Исключения и ошибки API
+
+КОНСТРУКТОР TelegramClient:
+TelegramClient(session, api_id, api_hash, *, catch_up=False, flood_sleep_threshold=None,
+               device_model=None, system_version=None, app_version=None) [citation:7]
+
+ПАРАМЕТРЫ КЛИЕНТА:
+- session: Имя или путь к .session файлу (хранение авторизации)
+- api_id: ID приложения (получается на my.telegram.org)
+- api_hash: Хэш приложения (получается на my.telegram.org)
+- catch_up: Получать обновления, произошедшие во время отключения
+- flood_sleep_threshold: Максимальное время ожидания при flood wait [citation:7]
+
+ОСНОВНЫЕ МЕТОДЫ КЛИЕНТА:
+- client.start() - Запустить клиент (авторизация)
+- client.connect() / client.disconnect() - Подключение/отключение
+- client.get_me() - Получить информацию о текущем аккаунте
+- client.send_message(chat, text) - Отправить сообщение
+- client.send_file(chat, file) - Отправить файл
+- client.get_messages(chat, limit) - Получить сообщения
+- client.download_media(message) - Скачать медиа
+- client.download_profile_photo(user) - Скачать фото профиля
+- client.delete_messages(chat, message_ids) - Удалить сообщения
+- client.delete_dialog(chat) - Удалить диалог
+- client.edit_message(chat, message_id, text) - Редактировать сообщение
+- client.edit_draft(chat, text) - Редактировать черновик
+- client.add_event_handler(handler, event) - Добавить обработчик событий
+- client.bot_sign_in(token) - Вход как бот
+- client.check_password(token, password) - Проверка 2FA пароля [citation:7]
+
+ДЕКОРАТОРЫ СОБЫТИЙ:
+- @client.on(events.NewMessage) - Новое сообщение
+- @client.on(events.CallbackQuery) - Нажатие inline кнопки
+- @client.on(events.MessageEdited) - Редактирование сообщения
+- @client.on(events.UserUpdate) - Обновление пользователя
+- @client.on(events.ChatAction) - Действие в чате
+
+ФИЛЬТРЫ СОБЫТИЙ:
+- events.NewMessage(pattern='hello') - Фильтр по тексту
+- events.NewMessage(from_users='username') - Фильтр по отправителю
+- events.NewMessage(chats=chat_id) - Фильтр по чату [citation:4][citation:7]
+
+УСТАНОВКА:
+pip install telethon
+
+ПРИМЕР КОДА (СИНХРОННЫЙ):
+from telethon.sync import TelegramClient
+
+api_id = 12345
+api_hash = 'your_api_hash'
+
+with TelegramClient('session', api_id, api_hash) as client:
+    # Получение информации о себе
+    me = client.get_me()
+    print(me.stringify())
+    
+    # Отправка сообщения
+    client.send_message('username', 'Hello from Telethon!')
+    
+    # Отправка файла
+    client.send_file('username', '/path/to/photo.jpg')
+    
+    # Скачивание фото профиля
+    client.download_profile_photo('me', 'profile.jpg')
+    
+    # Получение последних сообщений
+    messages = client.get_messages('username', limit=10)
+    for msg in messages:
+        print(msg.text)
+
+ПРИМЕР КОДА (АСИНХРОННЫЙ С СОБЫТИЯМИ):
+from telethon import TelegramClient, events
+import asyncio
+
+api_id = 12345
+api_hash = 'your_api_hash'
+
+client = TelegramClient('session', api_id, api_hash)
+
+@client.on(events.NewMessage(pattern='(?i)hello'))
+async def handler(event):
+    await event.reply('Hello to you too!')
+
+@client.on(events.NewMessage(chats='username'))
+async def specific_handler(event):
+    print(f"New message from {event.sender_id}: {event.text}")
+
+async def main():
+    await client.start()
+    print("Client started. Waiting for messages...")
+    await client.run_until_disconnected()
+
+asyncio.run(main())
+
+ПРИМЕР КОДА (BOT):
+from telethon import TelegramClient
+
+bot = TelegramClient('bot', api_id, api_hash)
+bot.start(bot_token='YOUR_BOT_TOKEN')
+
+# Отправка сообщения
+bot.send_message('username', 'Hello from bot!')

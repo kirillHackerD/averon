@@ -1,0 +1,107 @@
+HTTPX Library Documentation
+
+Modern, fast HTTP client for Python with sync and async support.
+
+Installation:
+pip install httpx
+
+Basic GET Request:
+import httpx
+
+response = httpx.get('https://api.example.com/data')
+print(response.status_code)
+print(response.json())
+
+POST with JSON:
+import httpx
+
+data = {'key': 'value'}
+response = httpx.post('https://api.example.com/post', json=data)
+print(response.json())
+
+POST with form data:
+response = httpx.post(
+    'https://api.example.com/form',
+    data={'field1': 'value1', 'field2': 'value2'}
+)
+
+Headers:
+headers = {
+    'Authorization': 'Bearer token123',
+    'X-Custom-Header': 'value'
+}
+response = httpx.get('https://api.example.com', headers=headers)
+
+Query Parameters:
+params = {'key': 'api_key', 'limit': 10}
+response = httpx.get('https://api.example.com/search', params=params)
+
+Async Usage:
+import httpx
+import asyncio
+
+async def fetch_data():
+    async with httpx.AsyncClient() as client:
+        response = await client.get('https://api.example.com')
+        return response.json()
+
+data = asyncio.run(fetch_data())
+
+Multiple Async Requests:
+import httpx
+import asyncio
+
+async def fetch_all():
+    async with httpx.AsyncClient() as client:
+        tasks = [
+            client.get('https://api.example.com/user/1'),
+            client.get('https://api.example.com/user/2'),
+            client.get('https://api.example.com/user/3')
+        ]
+        responses = await asyncio.gather(*tasks)
+        return [r.json() for r in responses]
+
+data = asyncio.run(fetch_all())
+
+Client with Base URL:
+client = httpx.Client(base_url='https://api.example.com')
+response = client.get('/users')
+response = client.post('/users', json={'name': 'John'})
+client.close()
+
+# Or use context manager
+with httpx.Client(base_url='https://api.example.com') as client:
+    response = client.get('/users')
+
+Timeouts:
+response = httpx.get('https://api.example.com', timeout=5.0)
+
+Custom timeout:
+timeout = httpx.Timeout(10.0, connect=2.0)
+response = httpx.get('https://api.example.com', timeout=timeout)
+
+Error Handling:
+import httpx
+
+try:
+    response = httpx.get('https://api.example.com')
+    response.raise_for_status()
+except httpx.HTTPStatusError as e:
+    print(f"HTTP error: {e.response.status_code}")
+except httpx.ConnectError:
+    print("Connection failed")
+except httpx.TimeoutException:
+    print("Request timed out")
+
+Streaming:
+with httpx.stream('GET', 'https://api.example.com/large-file') as response:
+    for chunk in response.iter_bytes():
+        process(chunk)
+
+Best Practices:
+- Use AsyncClient for multiple concurrent requests
+- Use Client with base_url for API clients
+- Always set timeouts
+- Handle exceptions properly
+- Use context managers for proper cleanup
+- HTTPX is faster than requests for async workloads

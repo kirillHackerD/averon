@@ -1,0 +1,94 @@
+========================================
+БИБЛИОТЕКА: OpenTelemetry (opentelemetry)
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://opentelemetry.io/docs/languages/python/
+РЕПОЗИТОРИЙ: https://github.com/open-telemetry/opentelemetry-python
+
+ОПИСАНИЕ:
+Фреймворк для observability (наблюдаемости), предназначенный для генерации
+и сбора телеметрических данных: трассировок (traces), метрик (metrics) и логов (logs).
+Позволяет стандартизировать сбор данных о работе приложений [citation:1][citation:9].
+
+СТАТУС КОМПОНЕНТОВ:
+- Traces: Стабильный (Stable)
+- Metrics: Стабильный (Stable)
+- Logs: В разработке (Development) [citation:1][citation:9]
+
+ВЕРСИИ PYTHON:
+Поддерживает Python 3.9 и выше [citation:1][citation:9].
+
+ОСНОВНЫЕ ПАКЕТЫ:
+- opentelemetry-api: API для инструментирования кода
+- opentelemetry-sdk: SDK для реализации и экспорта данных
+- opentelemetry-exporter-*: Экспортеры (Jaeger, Zipkin, Prometheus, OTLP)
+- opentelemetry-instrumentation-*: Готовые инструментирования для библиотек
+- opentelemetry-semantic-conventions: Семантические соглашения [citation:1][citation:6]
+
+ОСНОВНЫЕ КОМПОНЕНТЫ API:
+- TracerProvider: Поставщик трассировщиков
+- Tracer: Объект для создания спанов
+- Span: Единица работы (операция) с временными рамками
+- MeterProvider: Поставщик метрик
+- Meter: Объект для создания инструментов метрик
+- Counter, Gauge, Histogram: Типы метрик [citation:6]
+
+ОСНОВНЫЕ ОПЕРАЦИИ С ТРАССАМИ:
+- trace.get_tracer(name) - Получить трассировщик
+- tracer.start_as_current_span(name) - Создать текущий спан (контекстный менеджер)
+- span.set_attribute(key, value) - Добавить атрибут к спану
+- span.add_event(name) - Добавить событие
+- span.set_status(StatusCode.ERROR) - Установить статус ошибки
+- span.record_exception(exc) - Записать исключение
+- trace.get_current_span() - Получить текущий спан [citation:6]
+
+ОСНОВНЫЕ ОПЕРАЦИИ С МЕТРИКАМИ:
+- metrics.get_meter(name) - Получить метр
+- meter.create_counter(name) - Создать счетчик
+- meter.create_histogram(name) - Создать гистограмму
+- meter.create_up_down_counter(name) - Создать счетчик +/- [citation:6]
+
+ПРОПАГАЦИЯ КОНТЕКСТА:
+Поддерживаемые форматы:
+- tracecontext: W3C Trace Context (по умолчанию)
+- baggage: W3C Baggage (по умолчанию)
+- b3: B3 Single (Zipkin)
+- b3multi: B3 Multi
+- jaeger: Jaeger [citation:6]
+
+УСТАНОВКА:
+pip install opentelemetry-api
+pip install opentelemetry-sdk
+pip install opentelemetry-exporter-otlp  # Пример экспортера
+
+ПРИМЕР КОДА (ТРАССИРОВКА):
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
+# Настройка провайдера
+provider = TracerProvider()
+processor = BatchSpanProcessor(ConsoleSpanExporter())
+provider.add_span_processor(processor)
+trace.set_tracer_provider(provider)
+
+# Получение трассировщика
+tracer = trace.get_tracer("my.app")
+
+# Создание спана
+with tracer.start_as_current_span("main-operation") as span:
+    span.set_attribute("user.id", "12345")
+    span.add_event("Processing started")
+    
+    # Вложенный спан
+    with tracer.start_as_current_span("sub-operation"):
+        print("Выполнение работы...")
+    
+    span.add_event("Processing completed")
+
+ПРИМЕР КОДА (ДЕКОРАТОР):
+@tracer.start_as_current_span("do_work")
+def do_work():
+    print("Выполнение работы...")

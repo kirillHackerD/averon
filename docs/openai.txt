@@ -1,0 +1,90 @@
+OpenAI API Documentation
+
+OpenAI API provides access to GPT models for text generation and completion.
+
+Basic Usage:
+import openai
+
+# Initialize client
+client = OpenAI(api_key='your-api-key')
+
+# Chat completion
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello!"}
+    ],
+    temperature=0.7,
+    max_tokens=150
+)
+
+reply = response.choices[0].message.content
+
+Key Parameters:
+- model: Model to use (gpt-4, gpt-3.5-turbo, etc.)
+- messages: List of message objects with role and content
+- temperature: Randomness (0.0-2.0, lower = more focused)
+- max_tokens: Maximum response length
+- top_p: Nucleus sampling (0.0-1.0)
+- frequency_penalty: Reduce repetition (-2.0-2.0)
+- presence_penalty: Encourage new topics (-2.0-2.0)
+
+Message Roles:
+- system: Instructions for the AI
+- user: User messages
+- assistant: AI responses
+
+Streaming Responses:
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Hello"}],
+    stream=True
+)
+
+for chunk in response:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end='')
+
+Function Calling:
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get weather information",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string"}
+                }
+            }
+        }
+    }
+]
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "What's the weather in NYC?"}],
+    tools=tools
+)
+
+Error Handling:
+try:
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": "Hello"}]
+    )
+except openai.APIError as e:
+    print(f'OpenAI API error: {e}')
+except openai.RateLimitError as e:
+    print(f'Rate limit exceeded: {e}')
+except openai.AuthenticationError as e:
+    print(f'Authentication failed: {e}')
+
+Best Practices:
+- Use system messages for clear instructions
+- Set appropriate temperature for task (0.0 for code, 0.7 for creative)
+- Handle rate limits gracefully
+- Use streaming for long responses
+- Validate user input before sending to API

@@ -1,0 +1,153 @@
+========================================
+БИБЛИОТЕКА: ctypes
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/ctypes.html
+
+ОПИСАНИЕ:
+Библиотека для вызова функций из динамических библиотек (DLL, SO, dylib).
+Позволяет работать с C-функциями, структурами и типами данных напрямую из Python.
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- cdll: Загрузка DLL с соглашением вызова cdecl (стандартное)
+- windll: Загрузка DLL с соглашением вызова stdcall (Windows)
+- oledll: Загрузка COM-библиотек (Windows)
+- c_*: Типы данных (c_int, c_char, c_void_p, c_wchar_p и др.)
+- Structure: Базовый класс для создания C-структур
+- Union: Базовый класс для создания C-объединений
+- POINTER: Создание указателя на тип
+- byref: Передача аргумента по ссылке
+- cast: Приведение типов
+- create_string_buffer: Создание буфера для строк
+
+ОСНОВНЫЕ ТИПЫ ДАННЫХ:
+- c_char: char (1 байт)
+- c_byte: signed char
+- c_ubyte: unsigned char
+- c_short: short
+- c_ushort: unsigned short
+- c_int: int
+- c_uint: unsigned int
+- c_long: long
+- c_ulong: unsigned long
+- c_longlong: long long
+- c_ulonglong: unsigned long long
+- c_float: float
+- c_double: double
+- c_char_p: char* (строка)
+- c_wchar_p: wchar_t* (Unicode строка)
+- c_void_p: void* (универсальный указатель)
+- c_bool: bool
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- ctypes.CDLL(path) - Загрузить DLL с соглашением cdecl
+- ctypes.WinDLL(path) - Загрузить DLL с соглашением stdcall (Windows)
+- ctypes.util.find_library(name) - Найти библиотеку в системе
+- ctypes.addressof(obj) - Получить адрес объекта
+- ctypes.sizeof(obj) - Получить размер объекта
+- ctypes.memmove(dst, src, count) - Копировать память
+- ctypes.memset(dst, c, count) - Заполнить память
+- ctypes.string_at(address, size) - Прочитать строку из памяти
+- ctypes.set_conversion_mode(encoding, errors) - Установить кодировку
+
+СОЗДАНИЕ СТРУКТУР:
+class MyStructure(ctypes.Structure):
+    _fields_ = [
+        ("field1", ctypes.c_int),
+        ("field2", ctypes.c_char * 256),
+        ("field3", ctypes.c_void_p)
+    ]
+    _pack_ = 1  # Выравнивание (опционально)
+
+СОЗДАНИЕ ОБЪЕДИНЕНИЙ:
+class MyUnion(ctypes.Union):
+    _fields_ = [
+        ("int_value", ctypes.c_int),
+        ("float_value", ctypes.c_float)
+    ]
+
+РАБОТА С УКАЗАТЕЛЯМИ:
+- pointer_type = ctypes.POINTER(ctypes.c_int) - Тип указателя
+- ptr = ctypes.pointer(value) - Создать указатель
+- ptr.contents - Получить значение по указателю
+- ptr[0] - Доступ по индексу
+
+ОСОБЕННОСТИ:
+- Поддержка callbacks (функции обратного вызова)
+- Поддержка пользовательских типов
+- Поддержка наследования структур
+- Возможность экспорта функций из Python в C
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import ctypes
+
+# Загрузка библиотеки (Linux - libc.so, Windows - msvcrt.dll)
+try:
+    libc = ctypes.CDLL("libc.so.6")  # Linux
+except:
+    libc = ctypes.CDLL("msvcrt.dll")  # Windows
+
+# Вызов функции printf
+libc.printf(b"Hello from C!\n")
+
+# Работа с типами
+i = ctypes.c_int(42)
+print(i.value)  # 42
+i.value = 100
+print(i.value)  # 100
+
+# Строки
+string = ctypes.c_char_p(b"Hello World")
+print(string.value)  # b'Hello World'
+
+# Создание структуры
+class Point(ctypes.Structure):
+    _fields_ = [
+        ("x", ctypes.c_int),
+        ("y", ctypes.c_int)
+    ]
+
+p = Point(10, 20)
+print(f"x={p.x}, y={p.y}")
+
+# Создание объединения
+class Value(ctypes.Union):
+    _fields_ = [
+        ("int_val", ctypes.c_int),
+        ("float_val", ctypes.c_float)
+    ]
+
+v = Value()
+v.int_val = 42
+print(v.int_val)    # 42
+print(v.float_val)  # интерпретация как float
+
+# Массивы
+arr = (ctypes.c_int * 5)(1, 2, 3, 4, 5)
+for i in range(5):
+    print(arr[i])
+
+# Работа с указателями
+value = ctypes.c_int(42)
+ptr = ctypes.pointer(value)
+print(ptr.contents.value)  # 42
+ptr.contents.value = 100
+print(value.value)  # 100
+
+# Буфер
+buffer = ctypes.create_string_buffer(100)
+ctypes.memmove(buffer, b"Hello", 5)
+print(buffer.value)  # b'Hello'
+
+# Callback функция
+CMPFUNC = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_int)
+
+def py_cmp(a, b):
+    return a - b
+
+cmp = CMPFUNC(py_cmp)

@@ -1,0 +1,87 @@
+Concurrent Futures Module Documentation
+
+High-level interface for asynchronously executing callables using threads or processes.
+
+ThreadPoolExecutor:
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Basic usage
+with ThreadPoolExecutor(max_workers=5) as executor:
+    future = executor.submit(function, arg1, arg2)
+    result = future.result()
+
+# Map function over iterable
+with ThreadPoolExecutor(max_workers=5) as executor:
+    results = executor.map(function, iterable)
+
+# Multiple futures
+with ThreadPoolExecutor(max_workers=10) as executor:
+    futures = {executor.submit(func, item): item for item in items}
+    for future in as_completed(futures):
+        try:
+            result = future.result()
+            print(f"Result: {result}")
+        except Exception as e:
+            print(f"Error: {e}")
+
+ProcessPoolExecutor:
+
+from concurrent.futures import ProcessPoolExecutor
+
+# For CPU-bound tasks
+with ProcessPoolExecutor(max_workers=4) as executor:
+    result = executor.submit(cpu_intensive_function, data)
+
+Future Methods:
+
+future = executor.submit(func, *args)
+
+# Check if done
+if future.done():
+    print("Task completed")
+
+# Get result (blocks until ready)
+result = future.result(timeout=30)
+
+# Check for exception
+if future.exception():
+    print(f"Error: {future.exception()}")
+
+# Add callback
+future.add_done_callback(callback_function)
+
+# Cancel (if not started)
+future.cancel()
+
+Port Scanner Example:
+import socket
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def check_port(target, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
+    result = sock.connect_ex((target, port))
+    sock.close()
+    return port if result == 0 else None
+
+target = '127.0.0.1'
+ports = range(1, 1025)
+
+with ThreadPoolExecutor(max_workers=100) as executor:
+    futures = {executor.submit(check_port, target, port): port for port in ports}
+    open_ports = []
+    for future in as_completed(futures):
+        result = future.result()
+        if result:
+            open_ports.append(result)
+
+print(f"Open ports: {sorted(open_ports)}")
+
+Best Practices:
+- Use ThreadPoolExecutor for I/O-bound tasks (network, file)
+- Use ProcessPoolExecutor for CPU-bound tasks
+- Always use 'with' statement for proper cleanup
+- Set appropriate max_workers (5-10 for threads, number of CPU cores for processes)
+- Handle exceptions in futures
+- Use as_completed() for handling results as they arrive

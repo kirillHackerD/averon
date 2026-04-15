@@ -1,0 +1,137 @@
+========================================
+БИБЛИОТЕКА: sys
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/sys.html
+
+ОПИСАНИЕ:
+Модуль, предоставляющий доступ к системным параметрам и функциям,
+зависящим от интерпретатора Python. Позволяет работать с аргументами командной строки,
+потоками ввода/вывода, путями поиска модулей и т.д.
+
+ОСНОВНЫЕ АТРИБУТЫ:
+- sys.argv: Список аргументов командной строки
+- sys.path: Список путей поиска модулей
+- sys.modules: Словарь загруженных модулей
+- sys.platform: Имя операционной системы
+- sys.version: Версия Python
+- sys.version_info: Информация о версии (кортеж)
+- sys.executable: Путь к интерпретатору Python
+- sys.byteorder: Порядок байтов ('little' или 'big')
+- sys.maxsize: Максимальный размер целого числа
+- sys.float_info: Информация о типах float
+- sys.int_info: Информация о типах int
+- sys.builtin_module_names: Имена встроенных модулей
+- sys.api_version: Версия C API
+- sys.copyright: Информация об авторских правах
+- sys.hexversion: Версия Python в шестнадцатеричном формате
+- sys.implementation: Информация о реализации Python
+
+ОСНОВНЫЕ ПОТОКИ:
+- sys.stdin: Стандартный ввод (stdin)
+- sys.stdout: Стандартный вывод (stdout)
+- sys.stderr: Стандартный вывод ошибок (stderr)
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- sys.exit([arg]) - Выход из программы
+- sys.getrecursionlimit() - Получить глубину рекурсии
+- sys.setrecursionlimit(limit) - Установить глубину рекурсии
+- sys.getsizeof(object) - Размер объекта в байтах
+- sys.getrefcount(object) - Количество ссылок на объект
+- sys.getdefaultencoding() - Кодировка по умолчанию
+- sys.setdefaultencoding(encoding) - Установить кодировку
+- sys.getfilesystemencoding() - Кодировка файловой системы
+- sys.getswitchinterval() - Интервал переключения потоков
+- sys.setswitchinterval(interval) - Установить интервал
+- sys.getprofile() - Получить профилировщик
+- sys.setprofile(profilefunc) - Установить профилировщик
+- sys.gettrace() - Получить отладчик
+- sys.settrace(tracefunc) - Установить отладчик
+- sys._current_frames() - Текущие кадры выполнения
+- sys.exc_info() - Информация об исключении
+- sys.excepthook(type, value, traceback) - Обработчик исключений
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+import sys
+
+# АРГУМЕНТЫ КОМАНДНОЙ СТРОКИ
+print(f"Имя скрипта: {sys.argv[0]}")
+print(f"Аргументы: {sys.argv[1:]}")
+
+# ИНФОРМАЦИЯ О СИСТЕМЕ
+print(f"Платформа: {sys.platform}")
+print(f"Версия Python: {sys.version}")
+print(f"Детали версии: {sys.version_info}")
+print(f"Путь к интерпретатору: {sys.executable}")
+print(f"Порядок байтов: {sys.byteorder}")
+print(f"Максимальный размер: {sys.maxsize}")
+
+# ПУТИ ПОИСКА МОДУЛЕЙ
+print("\nПути поиска модулей:")
+for path in sys.path:
+    print(f"  {path}")
+
+# ЗАГРУЖЕННЫЕ МОДУЛИ
+print(f"\nКоличество загруженных модулей: {len(sys.modules)}")
+
+# ПОТОКИ ВВОДА/ВЫВОДА
+sys.stdout.write("Запись в stdout\n")
+sys.stderr.write("Запись в stderr\n")
+
+# ЧТЕНИЕ ИЗ STDIN
+print("Введите текст (Ctrl+D для выхода):")
+for line in sys.stdin:
+    sys.stdout.write(f"Вы ввели: {line}")
+
+# ВЫХОД ИЗ ПРОГРАММЫ
+def check_condition(condition):
+    if not condition:
+        print("Ошибка: условие не выполнено")
+        sys.exit(1)
+    print("Условие выполнено")
+
+# ГЛУБИНА РЕКУРСИИ
+print(f"\nТекущая глубина рекурсии: {sys.getrecursionlimit()}")
+sys.setrecursionlimit(2000)
+print(f"Новая глубина рекурсии: {sys.getrecursionlimit()}")
+
+# РАЗМЕР ОБЪЕКТОВ
+my_list = [1, 2, 3, 4, 5]
+my_dict = {'a': 1, 'b': 2}
+print(f"Размер списка: {sys.getsizeof(my_list)} байт")
+print(f"Размер словаря: {sys.getsizeof(my_dict)} байт")
+
+# КОДИРОВКИ
+print(f"Кодировка по умолчанию: {sys.getdefaultencoding()}")
+print(f"Кодировка файловой системы: {sys.getfilesystemencoding()}")
+
+# ОБРАБОТКА ИСКЛЮЧЕНИЙ
+try:
+    x = 1 / 0
+except:
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    print(f"Тип исключения: {exc_type}")
+    print(f"Значение: {exc_value}")
+
+# КАСТОМНЫЙ ОБРАБОТЧИК ИСКЛЮЧЕНИЙ
+def custom_excepthook(exc_type, exc_value, exc_traceback):
+    print(f"Пользовательский обработчик: {exc_type.__name__}: {exc_value}")
+
+sys.excepthook = custom_excepthook
+
+# ГЕНЕРАЦИЯ ИСКЛЮЧЕНИЯ ДЛЯ ТЕСТА
+try:
+    raise ValueError("Тестовая ошибка")
+except:
+    pass
+
+# СТАНДАРТНЫЙ ВВОД/ВЫВОД КАК ФАЙЛЫ
+sys.stdout = open('output.txt', 'w')
+print("Это будет записано в файл")
+sys.stdout.close()
+sys.stdout = sys.__stdout__  # Восстановление

@@ -1,0 +1,78 @@
+========================================
+БИБЛИОТЕКА: pywifi
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ДОКУМЕНТАЦИЯ: https://github.com/awkman/pywifi (основной репозиторий)
+ЛИЦЕНЗИЯ: MIT
+
+ОПИСАНИЕ:
+Кроссплатформенный модуль для управления Wi-Fi устройствами.
+Поддерживает Windows и Linux. Позволяет сканировать, подключаться
+и управлять беспроводными сетями.
+
+ОСНОВНЫЕ КЛАССЫ [citation:4]:
+- PyWiFi: Главный класс для доступа к Wi-Fi интерфейсам
+- Profile: Профиль подключения (SSID, пароль, тип шифрования)
+- Interface: Представляет Wi-Fi интерфейс (адаптер)
+
+ОСНОВНЫЕ КОНСТАНТЫ [citation:4]:
+- const.AUTH_ALG_OPEN: Открытая аутентификация
+- const.AKM_TYPE_WPA2PSK: Тип WPA2-PSK шифрования
+- const.CIPHER_TYPE_CCMP: Тип шифра CCMP (AES)
+- const.IFACE_DISCONNECTED: Статус - отключен
+- const.IFACE_CONNECTED: Статус - подключен
+- const.IFACE_INACTIVE: Статус - неактивен
+
+ОСНОВНЫЕ МЕТОДЫ Interface [citation:4]:
+- interface.disconnect() - Отключиться от сети
+- interface.status() - Получить статус подключения
+- interface.add_network_profile(profile) - Добавить профиль сети
+- interface.remove_all_network_profiles() - Удалить все профили
+- interface.connect(profile) - Подключиться к сети
+- interface.scan() - Сканировать доступные сети
+
+ТРЕБОВАНИЯ [citation:4]:
+- Linux: Требуется запущенный wpa_supplicant
+- Windows: Требуется Windows XP SP2 или новее (Native Wifi)
+
+УСТАНОВКА:
+pip install pywifi
+
+ПРИМЕР КОДА [citation:4]:
+import pywifi
+import time
+from pywifi import const
+
+# Инициализация
+wifi = pywifi.PyWiFi()
+iface = wifi.interfaces()[0]  # Первый Wi-Fi адаптер
+
+# Отключение
+iface.disconnect()
+time.sleep(1)
+
+# Создание профиля
+profile = pywifi.Profile()
+profile.ssid = 'testap'
+profile.auth = const.AUTH_ALG_OPEN
+profile.akm.append(const.AKM_TYPE_WPA2PSK)
+profile.cipher = const.CIPHER_TYPE_CCMP
+profile.key = '12345678'
+
+# Подключение
+iface.remove_all_network_profiles()
+tmp_profile = iface.add_network_profile(profile)
+iface.connect(tmp_profile)
+time.sleep(30)
+
+# Проверка статуса
+assert iface.status() == const.IFACE_CONNECTED
+
+# Отключение
+iface.disconnect()
+
+ПРИМЕЧАНИЕ:
+Существует также пакет pywifi-controls (для включения/отключения Wi-Fi) [citation:8].
+Основной пакет pywifi предназначен для сканирования и подключения к сетям.

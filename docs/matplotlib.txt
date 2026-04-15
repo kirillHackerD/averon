@@ -1,0 +1,159 @@
+Matplotlib Library Documentation
+
+Comprehensive library for creating static, animated, and interactive visualizations.
+
+Installation:
+pip install matplotlib
+
+Basic Line Plot:
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4, 5]
+y = [1, 4, 9, 16, 25]
+
+plt.plot(x, y)
+plt.xlabel('X Axis')
+plt.ylabel('Y Axis')
+plt.title('Simple Plot')
+plt.show()
+
+Multiple Lines:
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4, 5]
+y1 = [1, 4, 9, 16, 25]
+y2 = [1, 2, 3, 4, 5]
+
+plt.plot(x, y1, label='Square', color='red', linestyle='--')
+plt.plot(x, y2, label='Linear', color='blue', marker='o')
+plt.legend()
+plt.show()
+
+Bar Chart:
+import matplotlib.pyplot as plt
+
+categories = ['A', 'B', 'C', 'D']
+values = [10, 24, 36, 18]
+
+plt.bar(categories, values, color='skyblue')
+plt.xlabel('Category')
+plt.ylabel('Value')
+plt.title('Bar Chart')
+plt.show()
+
+Horizontal Bar Chart:
+plt.barh(categories, values, color='lightgreen')
+plt.show()
+
+Scatter Plot:
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4, 5]
+y = [2, 3, 5, 7, 11]
+sizes = [20, 50, 80, 200, 350]
+
+plt.scatter(x, y, s=sizes, alpha=0.5, c='purple')
+plt.show()
+
+Histogram:
+import matplotlib.pyplot as plt
+import numpy as np
+
+data = np.random.randn(1000)
+
+plt.hist(data, bins=30, color='green', edgecolor='black', alpha=0.7)
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+plt.title('Histogram')
+plt.show()
+
+Pie Chart:
+import matplotlib.pyplot as plt
+
+sizes = [30, 25, 25, 20]
+labels = ['A', 'B', 'C', 'D']
+colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue']
+explode = (0.1, 0, 0, 0)  # explode first slice
+
+plt.pie(sizes, labels=labels, colors=colors, explode=explode,
+        autopct='%1.1f%%', shadow=True, startangle=90)
+plt.axis('equal')  # Equal aspect ratio
+plt.show()
+
+Subplots:
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+
+axes[0, 0].plot([1, 2, 3], [1, 4, 9])
+axes[0, 0].set_title('Plot 1')
+
+axes[0, 1].bar(['A', 'B'], [10, 20])
+axes[0, 1].set_title('Plot 2')
+
+axes[1, 0].scatter([1, 2, 3], [1, 2, 3])
+axes[1, 0].set_title('Plot 3')
+
+axes[1, 1].pie([30, 70], labels=['A', 'B'])
+axes[1, 1].set_title('Plot 4')
+
+plt.tight_layout()
+plt.show()
+
+Styling:
+import matplotlib.pyplot as plt
+
+# Set style
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Or custom styling
+plt.plot([1, 2, 3], [1, 4, 9], linewidth=2, markersize=8)
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.xlim(0, 4)
+plt.ylim(0, 10)
+plt.show()
+
+Save Figure:
+import matplotlib.pyplot as plt
+
+plt.plot([1, 2, 3], [1, 4, 9])
+plt.savefig('plot.png', dpi=300, bbox_inches='tight')
+
+Available formats: png, pdf, svg, jpg, etc.
+
+3D Plot:
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+x = np.linspace(-5, 5, 100)
+y = np.linspace(-5, 5, 100)
+X, Y = np.meshgrid(x, y)
+Z = np.sin(np.sqrt(X**2 + Y**2))
+
+ax.plot_surface(X, Y, Z, cmap='viridis')
+plt.show()
+
+Date Plotting:
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from datetime import datetime, timedelta
+
+dates = [datetime.now() - timedelta(days=x) for x in range(10)]
+values = list(range(10))
+
+plt.plot(dates, values)
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+plt.gcf().autofmt_xdate()
+plt.show()
+
+Best Practices:
+- Use plt.tight_layout() to prevent label cutoff
+- Set appropriate figure size with figsize
+- Add labels and titles for clarity
+- Use consistent color schemes
+- Save with high DPI for publications
+- Close plots with plt.close() to free memory

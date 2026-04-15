@@ -1,0 +1,265 @@
+========================================
+БИБЛИОТЕКА: datetime
+========================================
+
+ТИП: Стандартная библиотека (встроенная)
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.python.org/3/library/datetime.html
+
+ОПИСАНИЕ:
+Модуль для работы с датами и временем. Предоставляет классы для
+манипуляции датами, временем, интервалами и их комбинациями.
+
+ОСНОВНЫЕ КЛАССЫ:
+- datetime.date: Дата (год, месяц, день)
+- datetime.time: Время (час, минута, секунда, микросекунда)
+- datetime.datetime: Комбинация даты и времени
+- datetime.timedelta: Разница между датами/временами
+- datetime.timezone: Информация о часовом поясе
+- datetime.tzinfo: Базовый класс для часовых поясов
+
+КЛАСС DATE:
+- date.today() - Текущая дата
+- date.fromtimestamp(ts) - Дата из timestamp
+- date.fromisoformat(str) - Из ISO строки
+- date.year, date.month, date.day - Атрибуты
+- date.replace(year, month, day) - Замена полей
+- date.weekday() - День недели (0=пн, 6=вс)
+- date.isoweekday() - День недели (1=пн, 7=вс)
+- date.isocalendar() - (ISO год, неделя, день)
+- date.isoformat() - ISO формат
+- date.strftime(format) - Форматирование
+
+КЛАСС TIME:
+- time(hour, minute, second, microsecond, tzinfo) - Конструктор
+- time.hour, time.minute, time.second, time.microsecond
+- time.replace() - Замена полей
+- time.isoformat() - ISO формат
+- time.strftime(format) - Форматирование
+
+КЛАСС DATETIME:
+- datetime.now() - Текущая дата и время
+- datetime.today() - Текущая дата и время
+- datetime.utcnow() - Текущее UTC время
+- datetime.fromtimestamp(ts) - Из timestamp
+- datetime.fromisoformat(str) - Из ISO строки
+- datetime.combine(date, time) - Объединение
+- datetime.strptime(str, format) - Парсинг строки
+- datetime.year, month, day, hour, minute, second, microsecond
+- datetime.date() - Получить дату
+- datetime.time() - Получить время
+- datetime.timetz() - Время с часовым поясом
+- datetime.timestamp() - Преобразование в timestamp
+- datetime.replace() - Замена полей
+- datetime.weekday(), isoweekday()
+- datetime.isoformat()
+- datetime.strftime(format)
+
+КЛАСС TIMEDELTA:
+- timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
+- total_seconds() - Общее количество секунд
+
+УСТАНОВКА:
+Установка не требуется. Входит в состав Python.
+
+ПРИМЕР КОДА:
+from datetime import datetime, date, time, timedelta, timezone
+import time as mod_time
+
+# ТЕКУЩАЯ ДАТА И ВРЕМЯ
+print("=== ТЕКУЩЕЕ ВРЕМЯ ===")
+print(f"date.today(): {date.today()}")
+print(f"datetime.now(): {datetime.now()}")
+print(f"datetime.today(): {datetime.today()}")
+print(f"datetime.utcnow(): {datetime.utcnow()}")
+
+# СОЗДАНИЕ ОБЪЕКТОВ
+print("\n=== СОЗДАНИЕ ===")
+d = date(2024, 12, 31)
+print(f"date(2024, 12, 31): {d}")
+
+t = time(14, 30, 45, 123456)
+print(f"time(14, 30, 45, 123456): {t}")
+
+dt = datetime(2024, 12, 31, 23, 59, 59, 999999)
+print(f"datetime(2024, 12, 31, 23, 59, 59): {dt}")
+
+# АТРИБУТЫ
+print("\n=== АТРИБУТЫ ===")
+print(f"Год: {dt.year}")
+print(f"Месяц: {dt.month}")
+print(f"День: {dt.day}")
+print(f"Час: {dt.hour}")
+print(f"Минута: {dt.minute}")
+print(f"Секунда: {dt.second}")
+print(f"Микросекунда: {dt.microsecond}")
+
+# ДНИ НЕДЕЛИ
+print("\n=== ДНИ НЕДЕЛИ ===")
+print(f"weekday() (0=пн): {dt.weekday()}")
+print(f"isoweekday() (1=пн): {dt.isoweekday()}")
+print(f"isocalendar(): {dt.isocalendar()}")
+
+# TIMEDELTA (РАЗНИЦА ВО ВРЕМЕНИ)
+print("\n=== TIMEDELTA ===")
+now = datetime.now()
+future = now + timedelta(days=10, hours=5, minutes=30)
+print(f"Сейчас: {now}")
+print(f"Через 10 дней 5ч 30м: {future}")
+
+delta = future - now
+print(f"Разница: {delta}")
+print(f"Всего секунд: {delta.total_seconds():.0f}")
+print(f"Дней: {delta.days}")
+print(f"Секунд (остаток): {delta.seconds}")
+
+# ОПЕРАЦИИ С TIMEDELTA
+print("\n=== ОПЕРАЦИИ ===")
+td1 = timedelta(days=5)
+td2 = timedelta(hours=48)
+print(f"td1: {td1}")
+print(f"td2: {td2}")
+print(f"td1 + td2: {td1 + td2}")
+print(f"td1 * 2: {td1 * 2}")
+print(f"td2 / 2: {td2 / 2}")
+
+# ФОРМАТИРОВАНИЕ (strftime)
+print("\n=== ФОРМАТИРОВАНИЕ ===")
+now = datetime.now()
+print(f"ISO формат: {now.isoformat()}")
+print(f"ISO (разделитель T): {now.isoformat('T')}")
+
+formats = {
+    "%Y-%m-%d": "Год-месяц-день",
+    "%d.%m.%Y": "День.месяц.год",
+    "%H:%M:%S": "Часы:минуты:секунды",
+    "%A, %d %B %Y": "Полный день, дата",
+    "%a, %d %b %Y": "Сокращенный день, дата",
+    "%I:%M %p": "12-часовой формат",
+    "%j": "День года",
+    "%W": "Неделя года"
+}
+
+for fmt, desc in formats.items():
+    print(f"{desc:30} : {now.strftime(fmt)}")
+
+# ПАРСИНГ СТРОК (strptime)
+print("\n=== ПАРСИНГ ===")
+date_string = "25.12.2024 15:30:00"
+parsed = datetime.strptime(date_string, "%d.%m.%Y %H:%M:%S")
+print(f"'{date_string}' -> {parsed}")
+
+# ISO ПАРСИНГ
+iso_string = "2024-12-31T23:59:59.123456"
+parsed_iso = datetime.fromisoformat(iso_string)
+print(f"fromisoformat('{iso_string}'): {parsed_iso}")
+
+# TIMESTAMP
+print("\n=== TIMESTAMP ===")
+timestamp = datetime.now().timestamp()
+print(f"timestamp: {timestamp}")
+print(f"fromtimestamp: {datetime.fromtimestamp(timestamp)}")
+print(f"utcfromtimestamp: {datetime.utcfromtimestamp(timestamp)}")
+
+# ЗАМЕНА ПОЛЕЙ (replace)
+print("\n=== REPLACE ===")
+dt = datetime(2024, 12, 31, 23, 59, 59)
+print(f"Исходный: {dt}")
+print(f"Замена года: {dt.replace(year=2025)}")
+print(f"Замена месяца: {dt.replace(month=6)}")
+print(f"Замена времени: {dt.replace(hour=12, minute=0, second=0)}")
+
+# КОМБИНИРОВАНИЕ
+print("\n=== КОМБИНИРОВАНИЕ ===")
+d = date(2024, 12, 31)
+t = time(23, 59, 59)
+combined = datetime.combine(d, t)
+print(f"date: {d}")
+print(f"time: {t}")
+print(f"combined: {combined}")
+
+# ПОЛУЧЕНИЕ ДАТЫ/ВРЕМЕНИ ИЗ DATETIME
+print("\n=== РАЗДЕЛЕНИЕ ===")
+dt = datetime.now()
+print(f"datetime: {dt}")
+print(f"date(): {dt.date()}")
+print(f"time(): {dt.time()}")
+print(f"timetz(): {dt.timetz()}")
+
+# ЧАСОВЫЕ ПОЯСА
+print("\n=== ЧАСОВЫЕ ПОЯСА ===")
+utc = timezone.utc
+dt_utc = datetime.now(utc)
+print(f"UTC: {dt_utc}")
+
+# Создание смещенного часового пояса
+offset = timezone(timedelta(hours=3))
+dt_msk = datetime.now(offset)
+print(f"MSK (+3): {dt_msk}")
+
+# РАЗНИЦА МЕЖДУ ЧАСОВЫМИ ПОЯСАМИ
+dt1 = datetime.now(timezone.utc)
+dt2 = datetime.now(timezone(timedelta(hours=5)))
+print(f"Разница: {dt2 - dt1}")
+
+# РАБОТА С ВОЗРАСТОМ
+print("\n=== ВОЗРАСТ ===")
+birth_date = date(1990, 5, 15)
+today = date.today()
+age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+print(f"Дата рождения: {birth_date}")
+print(f"Возраст: {age} лет")
+
+# ДО ДНЯ РОЖДЕНИЯ
+next_birthday = date(today.year, birth_date.month, birth_date.day)
+if next_birthday < today:
+    next_birthday = next_birthday.replace(year=today.year + 1)
+days_until = (next_birthday - today).days
+print(f"Дней до дня рождения: {days_until}")
+
+# ПЕРВЫЙ И ПОСЛЕДНИЙ ДЕНЬ МЕСЯЦА
+print("\n=== ГРАНИЦЫ МЕСЯЦА ===")
+current = datetime.now()
+first_day = current.replace(day=1)
+if current.month == 12:
+    last_day = current.replace(year=current.year + 1, month=1, day=1) - timedelta(days=1)
+else:
+    last_day = current.replace(month=current.month + 1, day=1) - timedelta(days=1)
+print(f"Первый день: {first_day.date()}")
+print(f"Последний день: {last_day.date()}")
+
+# ГЕНЕРАЦИЯ ДИАПАЗОНА ДАТ
+print("\n=== ДИАПАЗОН ДАТ ===")
+start = date(2024, 1, 1)
+end = date(2024, 1, 10)
+dates = [start + timedelta(days=i) for i in range((end - start).days + 1)]
+print(f"Даты с {start} по {end}:")
+for d in dates:
+    print(f"  {d}")
+
+# ВЫЧИСЛЕНИЕ ВРЕМЕНИ ДО СОБЫТИЯ
+print("\n=== ТАЙМЕР ДО СОБЫТИЯ ===")
+event = datetime(2025, 1, 1, 0, 0, 0)
+now = datetime.now()
+if event > now:
+    delta = event - now
+    days = delta.days
+    hours = delta.seconds // 3600
+    minutes = (delta.seconds % 3600) // 60
+    seconds = delta.seconds % 60
+    print(f"До Нового 2025 года:")
+    print(f"  {days} дней, {hours} часов, {minutes} минут, {seconds} секунд")
+
+# СРАВНЕНИЕ ДАТ
+print("\n=== СРАВНЕНИЕ ===")
+d1 = date(2024, 12, 31)
+d2 = date(2024, 1, 1)
+print(f"{d1} > {d2}: {d1 > d2}")
+print(f"{d1} < {d2}: {d1 < d2}")
+print(f"{d1} == {d2}: {d1 == d2}")
+
+# ПОЛУЧЕНИЕ ВРЕМЕНИ ИЗ TIMESTAMP
+timestamp = mod_time.time()
+print(f"\nTimestamp: {timestamp}")
+print(f"datetime.fromtimestamp: {datetime.fromtimestamp(timestamp)}")
+print(f"datetime.utcfromtimestamp: {datetime.utcfromtimestamp(timestamp)}")

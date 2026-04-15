@@ -1,0 +1,100 @@
+Python Standard Library Documentation
+
+Common Python modules and their usage:
+
+os Module - Operating System Interface:
+import os
+
+# File operations
+os.path.exists('file.txt')  # Check if file exists
+os.makedirs('folder', exist_ok=True)  # Create directory
+os.listdir('path')  # List files in directory
+os.remove('file.txt')  # Delete file
+os.rename('old.txt', 'new.txt')  # Rename file
+
+# Environment variables
+os.getenv('HOME', '/default')  # Get environment variable
+os.environ['VAR'] = 'value'  # Set environment variable
+
+json Module - JSON Encoding/Decoding:
+import json
+
+# Encode to JSON
+data = {'name': 'John', 'age': 30}
+json_str = json.dumps(data, indent=2)
+
+# Decode from JSON
+data = json.loads(json_str)
+
+# File operations
+with open('data.json', 'r') as f:
+    data = json.load(f)
+
+with open('data.json', 'w') as f:
+    json.dump(data, f, indent=2)
+
+datetime Module - Date and Time:
+from datetime import datetime, timedelta
+
+# Current time
+now = datetime.now()
+formatted = now.strftime('%Y-%m-%d %H:%M:%S')
+
+# Parse time string
+dt = datetime.strptime('2023-12-25', '%Y-%m-%d')
+
+# Time calculations
+future = now + timedelta(days=7)
+past = now - timedelta(hours=2)
+
+pathlib Module - Path Manipulation:
+from pathlib import Path
+
+# Create path objects
+path = Path('folder/file.txt')
+parent = path.parent
+name = path.name
+suffix = path.suffix
+
+# File operations
+path.exists()  # Check if exists
+path.mkdir(parents=True, exist_ok=True)  # Create directory
+path.write_text('Hello')  # Write text
+content = path.read_text()  # Read text
+
+re Module - Regular Expressions:
+import re
+
+# Search
+pattern = r'\b\d{3}-\d{3}-\d{4}\b'  # Phone number pattern
+match = re.search(pattern, text)
+
+# Find all
+matches = re.findall(pattern, text)
+
+# Replace
+new_text = re.sub(pattern, 'XXX-XXX-XXXX', text)
+
+collections Module - Special Containers:
+from collections import defaultdict, Counter
+
+# Default dict
+d = defaultdict(list)
+d['key'].append('value')
+
+# Counter
+counter = Counter(['apple', 'banana', 'apple'])
+print(counter['apple'])  # 2
+
+typing Module - Type Hints:
+from typing import List, Dict, Optional, Union
+
+def process_data(items: List[str], config: Dict[str, str]) -> Optional[str]:
+    return items[0] if items else None
+
+Best Practices:
+- Use with statements for file operations
+- Handle exceptions appropriately
+- Use pathlib instead of os.path when possible
+- Add type hints for better code documentation
+- Use f-strings for string formatting

@@ -1,0 +1,635 @@
+================================================================================
+                    AIOGRAM 3.X ПОЛНАЯ ДОКУМЕНТАЦИЯ
+================================================================================
+
+Aiogram — это современный и полностью асинхронный фреймворк для Telegram Bot API,
+написанный на Python 3.8+ с использованием asyncio и aiohttp [citation:2][citation:6].
+
+Официальный сайт: https://aiogram.dev
+Документация: https://docs.aiogram.dev
+GitHub: https://github.com/aiogram/aiogram
+PyPI: https://pypi.org/project/aiogram/
+
+================================================================================
+1. ОСНОВНЫЕ ХАРАКТЕРИСТИКИ
+================================================================================
+
+Aiogram 3.x предоставляет [citation:2][citation:6][citation:9]:
+
+- Полная асинхронность (asyncio, PEP 492)
+- Поддержка Telegram Bot API 7.10+ [citation:6]
+- Type hints (PEP 484) и совместимость с mypy
+- Поддержка PyPy
+- Автоматическая генерация кода для обновлений API
+- Роутер для обработки обновлений (аналог Blueprints)
+- Машина состояний (Finite State Machine - FSM)
+- Мощные "магические" фильтры (magic filters)
+- Middleware для входящих обновлений и API-вызовов
+- Поддержка Webhook и Long Polling
+- Встроенная интернационализация (I18n) с GNU Gettext
+
+================================================================================
+2. УСТАНОВКА
+================================================================================
+
+2.1 Базовая установка:
+pip install aiogram
+
+2.2 Установка конкретной версии:
+pip install aiogram==3.13.0
+
+2.3 Для разработки (последняя версия из dev-ветки):
+pip install git+https://github.com/aiogram/aiogram.git@dev-3.x
+
+2.4 Создание виртуального окружения [citation:1]:
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
+pip install -r requirements.txt
+
+================================================================================
+3. БЫСТРЫЙ СТАРТ (ПРОСТЕЙШИЙ БОТ)
+================================================================================
+
+3.1 Минимальный бот с командой /start и эхо-функцией [citation:2][citation:9]:
+
+import asyncio
+import logging
+import sys
+from os import getenv
+
+from aiogram import Bot, Dispatcher, html
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+
+# Получаем токен из переменных окружения
+TOKEN = getenv("BOT_TOKEN")
+
+# Инициализируем диспетчер и бота
+dp = Dispatcher()
+
+# Обработчик команды /start
+@dp.message(CommandStart())
+async def command_start_handler(message: Message) -> None:
+    """Ответ на команду /start"""
+    await message.answer(
+        f"Hello, {html.bold(message.from_user.full_name)}!"
+    )
+
+# Обработчик всех текстовых сообщений (эхо)
+@dp.message()
+async def echo_handler(message: Message) -> None:
+    """Отправляет копию сообщения обратно"""
+    try:
+        await message.send_copy(chat_id=message.chat.id)
+    except TypeError:
+        await message.answer("Nice try!")
+
+# Основная функция запуска
+async def main() -> None:
+    bot = Bot(
+        token=TOKEN,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())
+
+================================================================================
+4. СТРУКТУРА ПРОЕКТА (РЕКОМЕНДУЕМАЯ)
+================================================================================
+
+Рекомендуемая структура для production-бота [citation:1][citation:3]:
+
+project/
+├── .env                    # Переменные окружения (токен, БД)
+├── .env.example            # Пример .env файла
+├── requirements.txt        # Зависимости проекта
+├── main.py                 # Точка входа
+├── bot/
+│   ├── __init__.py
+│   ├── routers.py          # Сборка всех роутеров
+│   ├── handlers/           # Обработчики сообщений
+│   │   ├── __init__.py
+│   │   ├── start.py        # Команда /start
+│   │   ├── help.py         # Команда /help
+│   │   └── admin.py        # Административные команды
+│   ├── keyboards/          # Клавиатуры
+│   │   ├── __init__.py
+│   │   ├── inline.py       # Inline-клавиатуры
+│   │   └── reply.py        # Reply-клавиатуры
+│   ├── middlewares/        # Промежуточное ПО
+│   │   ├── __init__.py
+│   │   ├── throttling.py   # Антиспам
+│   │   └── auth.py         # Проверка прав доступа
+│   ├── filters/            # Кастомные фильтры
+│   │   ├── __init__.py
+│   │   └── is_admin.py     # Фильтр проверки администратора
+│   ├── services/           # Внешние сервисы
+│   │   ├── __init__.py
+│   │   └── db.py           # Работа с базой данных
+│   └── utils/              # Вспомогательные функции
+│       ├── __init__.py
+│       └── logging.py      # Настройка логирования
+
+================================================================================
+5. НАСТРОЙКА КОНФИГУРАЦИИ
+================================================================================
+
+5.1 Файл .env.example [citation:1]:
+BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+ADMIN_IDS=123456789,987654321
+DATABASE_URL=postgresql://user:pass@localhost/dbname
+
+5.2 Файл config.py для загрузки переменных [citation:1]:
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Settings:
+    BOT_TOKEN: str = os.getenv("BOT_TOKEN")
+    ADMIN_IDS: list = [int(id) for id in os.getenv("ADMIN_IDS", "").split(",") if id]
+    DATABASE_URL: str = os.getenv("DATABASE_URL")
+
+settings = Settings()
+
+================================================================================
+6. ОБРАБОТЧИКИ СООБЩЕНИЙ (HANDLERS)
+================================================================================
+
+6.1 Обработчик команды /start из файла handlers/start.py [citation:1]:
+from aiogram import Router
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+from aiogram import html
+
+router = Router()
+
+@router.message(CommandStart())
+async def cmd_start(message: Message):
+    """Обработчик команды /start"""
+    await message.answer(
+        f"Привет, {html.bold(message.from_user.full_name)}!\n"
+        "Я бот, созданный на aiogram 3.x"
+    )
+
+6.2 Обработчик с фильтром по тексту:
+from aiogram import Router
+from aiogram.filters import Text
+from aiogram.types import Message
+
+router = Router()
+
+@router.message(Text("Привет"))
+async def handle_hello(message: Message):
+    await message.answer("И тебе привет!")
+
+6.3 Обработчик с регулярным выражением:
+from aiogram import Router
+from aiogram.filters import Regexp
+from aiogram.types import Message
+
+router = Router()
+
+@router.message(Regexp(r"^\d+$"))  # Только цифры
+async def handle_numbers(message: Message):
+    await message.answer(f"Вы отправили число: {message.text}")
+
+================================================================================
+7. РОУТЕРЫ И ИХ ПОДКЛЮЧЕНИЕ
+================================================================================
+
+7.1 Создание роутера [citation:1]:
+# bot/routers.py
+from aiogram import Dispatcher
+from bot.handlers import start, help, admin
+
+def setup_routers(dp: Dispatcher):
+    """Подключение всех роутеров"""
+    dp.include_router(start.router)
+    dp.include_router(help.router)
+    dp.include_router(admin.router)
+
+7.2 Использование в main.py:
+from aiogram import Bot, Dispatcher
+from bot.routers import setup_routers
+
+dp = Dispatcher()
+setup_routers(dp)
+
+================================================================================
+8. КЛАВИАТУРЫ (KEYBOARDS)
+================================================================================
+
+8.1 Reply-клавиатура (обычная клавиатура) [citation:3]:
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
+reply_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Кнопка 1"), KeyboardButton(text="Кнопка 2")],
+        [KeyboardButton(text="Кнопка 3")]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+# Использование:
+await message.answer("Выберите опцию:", reply_markup=reply_keyboard)
+
+8.2 Inline-клавиатура (кнопки под сообщением):
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+inline_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Кнопка 1", callback_data="btn1"),
+            InlineKeyboardButton(text="Кнопка 2", callback_data="btn2")
+        ],
+        [InlineKeyboardButton(text="URL", url="https://example.com")]
+    ]
+)
+
+8.3 Обработка callback-запросов:
+from aiogram import Router
+from aiogram.types import CallbackQuery
+
+router = Router()
+
+@router.callback_query(lambda c: c.data == "btn1")
+async def process_callback(callback_query: CallbackQuery):
+    await callback_query.answer("Вы нажали кнопку 1")
+    await callback_query.message.edit_text("Кнопка нажата!")
+
+================================================================================
+9. МАШИНА СОСТОЯНИЙ (FSM)
+================================================================================
+
+9.1 Определение состояний [citation:3]:
+from aiogram.fsm.state import State, StatesGroup
+
+class RegistrationForm(StatesGroup):
+    name = State()          # Ожидание имени
+    age = State()           # Ожидание возраста
+    phone = State()         # Ожидание телефона
+
+9.2 Использование FSM:
+from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+
+router = Router()
+
+@router.message(Command("register"))
+async def start_registration(message: Message, state: FSMContext):
+    await state.set_state(RegistrationForm.name)
+    await message.answer("Введите ваше имя:")
+
+@router.message(RegistrationForm.name)
+async def process_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await state.set_state(RegistrationForm.age)
+    await message.answer("Введите ваш возраст:")
+
+@router.message(RegistrationForm.age)
+async def process_age(message: Message, state: FSMContext):
+    await state.update_data(age=message.text)
+    await state.set_state(RegistrationForm.phone)
+    await message.answer("Введите ваш телефон:")
+
+@router.message(RegistrationForm.phone)
+async def process_phone(message: Message, state: FSMContext):
+    data = await state.get_data()
+    await message.answer(
+        f"Регистрация завершена!\n"
+        f"Имя: {data['name']}\n"
+        f"Возраст: {data['age']}\n"
+        f"Телефон: {message.text}"
+    )
+    await state.clear()  # Очистка состояния
+
+================================================================================
+10. ФИЛЬТРЫ (FILTERS)
+================================================================================
+
+10.1 Создание кастомного фильтра [citation:1]:
+from aiogram.filters import Filter
+from aiogram.types import Message
+
+class IsAdmin(Filter):
+    """Фильтр для проверки, является ли пользователь администратором"""
+    
+    def __init__(self, admin_ids: list) -> None:
+        self.admin_ids = admin_ids
+    
+    async def __call__(self, message: Message) -> bool:
+        return message.from_user.id in self.admin_ids
+
+# Использование:
+from bot.filters.is_admin import IsAdmin
+from config import settings
+
+@router.message(IsAdmin(settings.ADMIN_IDS), Command("admin"))
+async def admin_command(message: Message):
+    await message.answer("Вы администратор!")
+
+================================================================================
+11. MIDDLEWARE (ПРОМЕЖУТОЧНОЕ ПО)
+================================================================================
+
+11.1 Простой middleware для антиспама [citation:1]:
+from typing import Callable, Dict, Any, Awaitable
+from aiogram import BaseMiddleware
+from aiogram.types import Message
+import time
+
+class ThrottlingMiddleware(BaseMiddleware):
+    """Ограничение частоты сообщений"""
+    
+    def __init__(self, rate_limit: float = 0.5):
+        self.rate_limit = rate_limit
+        self.last_message: Dict[int, float] = {}
+    
+    async def __call__(
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any]
+    ) -> Any:
+        user_id = event.from_user.id
+        current_time = time.time()
+        
+        # Проверяем, не отправлял ли пользователь сообщение слишком часто
+        if user_id in self.last_message:
+            if current_time - self.last_message[user_id] < self.rate_limit:
+                await event.answer("Слишком часто! Подождите.")
+                return
+        
+        self.last_message[user_id] = current_time
+        return await handler(event, data)
+
+# Регистрация middleware:
+dp.message.middleware(ThrottlingMiddleware(rate_limit=1.0))
+
+================================================================================
+12. ЗАПУСК БОТА (POLLING)
+================================================================================
+
+12.1 Базовый запуск с обработчиками старта и остановки [citation:10]:
+from aiogram import Bot, Dispatcher
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+async def set_commands(bot: Bot):
+    """Установка команд бота"""
+    from aiogram.types import BotCommand, BotCommandScopeDefault
+    commands = [
+        BotCommand(command="start", description="Запуск бота"),
+        BotCommand(command="help", description="Помощь"),
+        BotCommand(command="settings", description="Настройки"),
+    ]
+    await bot.set_my_commands(commands, BotCommandScopeDefault())
+
+async def start_bot(bot: Bot):
+    """Действия при запуске бота"""
+    await set_commands(bot)
+    logger.info("Бот запущен")
+
+async def stop_bot(bot: Bot):
+    """Действия при остановке бота"""
+    logger.info("Бот остановлен")
+
+async def main():
+    from config import settings
+    from bot.routers import setup_routers
+    
+    bot = Bot(token=settings.BOT_TOKEN)
+    dp = Dispatcher()
+    
+    # Подключаем роутеры
+    setup_routers(dp)
+    
+    # Регистрируем обработчики событий
+    dp.startup.register(start_bot)
+    dp.shutdown.register(stop_bot)
+    
+    try:
+        # Удаляем вебхук (на случай, если он был установлен)
+        await bot.delete_webhook(drop_pending_updates=True)
+        # Запускаем polling
+        await dp.start_polling(
+            bot,
+            allowed_updates=dp.resolve_used_update_types()
+        )
+    finally:
+        await bot.session.close()
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+
+================================================================================
+13. РАБОТА С МЕДИАФАЙЛАМИ
+================================================================================
+
+13.1 Отправка фото [citation:3]:
+from aiogram.types import FSInputFile
+
+# Отправка локального файла
+photo = FSInputFile("path/to/photo.jpg")
+await message.answer_photo(photo, caption="Подпись к фото")
+
+# Отправка по URL
+await message.answer_photo(
+    "https://example.com/image.jpg",
+    caption="Фото из интернета"
+)
+
+13.2 Получение и сохранение фото:
+@router.message(F.photo)
+async def handle_photo(message: Message):
+    """Обработка полученного фото"""
+    photo = message.photo[-1]  # Самое большое фото
+    file = await message.bot.get_file(photo.file_id)
+    await message.bot.download_file(file.file_path, "downloaded_photo.jpg")
+    await message.answer("Фото сохранено!")
+
+13.3 Работа с документами:
+@router.message(F.document)
+async def handle_document(message: Message):
+    document = message.document
+    await message.answer(f"Получен документ: {document.file_name}")
+
+================================================================================
+14. WEBHOOK РЕЖИМ
+================================================================================
+
+14.1 Настройка webhook:
+from aiogram import Bot, types
+from aiohttp import web
+
+async def handle_webhook(request):
+    """Обработка webhook запросов"""
+    update = types.Update(**await request.json())
+    await dp.feed_update(bot, update)
+    return web.Response()
+
+async def main():
+    bot = Bot(token=settings.BOT_TOKEN)
+    
+    # Устанавливаем webhook
+    await bot.set_webhook("https://your-domain.com/webhook")
+    
+    # Запускаем aiohttp сервер
+    app = web.Application()
+    app.router.post("/webhook", handle_webhook)
+    web.run_app(app, host="0.0.0.0", port=8443)
+
+================================================================================
+15. ЛОГИРОВАНИЕ
+================================================================================
+
+15.1 Настройка логирования [citation:4]:
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("bot.log"),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# Использование:
+logger.info("Бот запущен")
+logger.error(f"Ошибка: {e}")
+
+================================================================================
+16. ОБРАБОТКА ОШИБОК
+================================================================================
+
+16.1 Глобальный обработчик ошибок:
+from aiogram import Router
+from aiogram.types import ErrorEvent
+
+router = Router()
+
+@router.errors()
+async def error_handler(event: ErrorEvent):
+    """Глобальный обработчик ошибок"""
+    logger.error(f"Произошла ошибка: {event.exception}")
+    return True  # Ошибка обработана
+
+16.2 Обработка конкретных исключений:
+from aiogram.exceptions import TelegramForbiddenError
+
+@router.message()
+async def safe_handler(message: Message):
+    try:
+        await message.answer("Сообщение")
+    except TelegramForbiddenError:
+        logger.warning(f"Бот заблокирован пользователем {message.from_user.id}")
+
+================================================================================
+17. РАБОТА С БАЗОЙ ДАННЫХ (АСИНХРОННО)
+================================================================================
+
+17.1 Пример с asyncpg (PostgreSQL) [citation:1]:
+import asyncpg
+from contextlib import asynccontextmanager
+
+class Database:
+    def __init__(self, dsn: str):
+        self.dsn = dsn
+        self.pool = None
+    
+    async def connect(self):
+        """Создание пула соединений"""
+        self.pool = await asyncpg.create_pool(self.dsn)
+    
+    @asynccontextmanager
+    async def connection(self):
+        """Получение соединения из пула"""
+        async with self.pool.acquire() as conn:
+            yield conn
+    
+    async def get_user(self, user_id: int):
+        """Получение пользователя"""
+        async with self.connection() as conn:
+            return await conn.fetchrow(
+                "SELECT * FROM users WHERE id = $1", user_id
+            )
+
+================================================================================
+18. ПОЛЕЗНЫЕ СОВЕТЫ И ПРАКТИКИ
+================================================================================
+
+18.1 Использование F-фильтров (magic filters):
+from aiogram import F
+
+@router.message(F.text == "Привет")
+async def hello(message: Message):
+    await message.answer("И тебе привет!")
+
+@router.message(F.text.contains("погода"))
+async def weather(message: Message):
+    await message.answer("Погода отличная!")
+
+@router.message(F.from_user.id.in_([123, 456]))
+async def for_specific_users(message: Message):
+    await message.answer("Привет, избранный!")
+
+18.2 Получение информации о пользователе:
+@router.message(Command("info"))
+async def user_info(message: Message):
+    user = message.from_user
+    await message.answer(
+        f"ID: {user.id}\n"
+        f"Имя: {user.full_name}\n"
+        f"Username: @{user.username}\n"
+        f"Language: {user.language_code}"
+    )
+
+18.3 Отправка сообщения в определенный чат:
+@router.message(Command("notify"))
+async def notify(message: Message):
+    admin_id = 123456789
+    await message.bot.send_message(
+        admin_id,
+        f"Пользователь {message.from_user.id} отправил команду /notify"
+    )
+    await message.answer("Уведомление отправлено администратору")
+
+================================================================================
+19. ОФИЦИАЛЬНЫЕ РЕСУРСЫ
+================================================================================
+
+- Официальная документация: https://docs.aiogram.dev [citation:2]
+- GitHub репозиторий: https://github.com/aiogram/aiogram [citation:5]
+- PyPI страница: https://pypi.org/project/aiogram/ [citation:6]
+- Телеграм чаты поддержки:
+  - @aiogram (английский) [citation:2]
+  - @aiogram_ru (русский) [citation:2]
+  - @aiogram_ua (украинский)
+
+================================================================================
+20. РУКОВОДСТВА И ПРИМЕРЫ
+================================================================================
+
+- Книга по aiogram 3.x: https://mastergroosha.github.io/aiogram-3-guide/ [citation:8]
+- Коллекция примеров: https://github.com/KarasevMaksim/aiogram-example [citation:3]
+- Шаблон проекта: https://github.com/GLOM-ruvicon/aiogramm_easy_Template [citation:1]
+
+================================================================================
+                    КОНЕЦ ДОКУМЕНТАЦИИ
+================================================================================

@@ -1,0 +1,161 @@
+========================================
+БИБЛИОТЕКА: Pyrogram
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://docs.pyrogram.org/
+РЕПОЗИТОРИЙ: https://github.com/pyrogram/pyrogram
+
+ОПИСАНИЕ:
+Современная, элегантная и асинхронная библиотека для работы с Telegram MTProto API.
+Предоставляет удобный интерфейс для создания пользовательских клиентов и ботов.
+Отличается типизацией и высокой производительностью [citation:3][citation:5][citation:8].
+
+ОСНОВНЫЕ КОМПОНЕНТЫ:
+- Client: Главный класс клиента
+- filters: Фильтры для обработчиков сообщений
+- types: Типы данных (Message, User, Chat, CallbackQuery)
+- enums: Перечисления (ChatType, MessageEntityType и др.)
+- errors: Исключения API
+
+КОНСТРУКТОР Client:
+Client(name, api_id, api_hash, *, bot_token=None, session_string=None,
+       in_memory=False, phone_number=None, workdir=None) [citation:5]
+
+ПАРАМЕТРЫ КЛИЕНТА:
+- name: Имя сессии (или путь к файлу)
+- api_id: ID приложения (my.telegram.org)
+- api_hash: Хэш приложения
+- bot_token: Токен бота (опционально, для работы как бот)
+- session_string: Строка сессии для хранения в памяти
+- in_memory: Хранить сессию в памяти
+- workdir: Директория для файлов сессии [citation:5]
+
+ОСНОВНЫЕ МЕТОДЫ КЛИЕНТА:
+- client.start() - Запуск клиента (авторизация)
+- client.run() - Запуск с блокировкой
+- client.stop() - Остановка клиента
+- client.get_me() - Получить информацию о себе
+- client.send_message(chat_id, text) - Отправить сообщение
+- client.send_photo(chat_id, photo) - Отправить фото
+- client.send_document(chat_id, document) - Отправить документ
+- client.get_messages(chat_id, limit) - Получить сообщения
+- client.get_chat(chat_id) - Получить информацию о чате
+- client.get_users(user_ids) - Получить информацию о пользователях
+- client.download_media(message, file_name) - Скачать медиа
+- client.delete_messages(chat_id, message_ids) - Удалить сообщения
+- client.edit_message_text(chat_id, message_id, text) - Редактировать сообщение
+- client.answer_callback_query(callback_id, text) - Ответ на callback
+- client.join_chat(chat_id) - Присоединиться к чату
+- client.leave_chat(chat_id) - Покинуть чат
+
+ДЕКОРАТОРЫ:
+- @app.on_message() - Обработчик сообщений
+- @app.on_callback_query() - Обработчик callback запросов
+- @app.on_edited_message() - Обработчик отредактированных сообщений
+- @app.on_deleted_messages() - Обработчик удаленных сообщений
+
+ФИЛЬТРЫ:
+- filters.private - Только личные сообщения
+- filters.group - Только групповые чаты
+- filters.chat(chat_id) - Фильтр по чату
+- filters.user(user_id) - Фильтр по пользователю
+- filters.text - Текстовые сообщения
+- filters.command('start') - Команды
+- filters.regex(pattern) - Регулярное выражение
+- filters.photo - Сообщения с фото
+- filters.audio - Сообщения с аудио
+- filters.document - Сообщения с документами [citation:5]
+
+ОСОБЕННОСТИ:
+- Полностью асинхронный (asyncio)
+- Type-hints для отличной поддержки IDE
+- Высокая производительность (TgCrypto на C)
+- Поддержка синхронного режима для простоты
+- Полный доступ ко всем методам Telegram API [citation:5][citation:8]
+
+УСТАНОВКА:
+pip install pyrogram
+# Для улучшенной производительности:
+pip install tgcrypto
+
+ПРИМЕР КОДА (АСИНХРОННЫЙ):
+from pyrogram import Client, filters
+
+api_id = 12345
+api_hash = "your_api_hash"
+
+app = Client("my_account", api_id=api_id, api_hash=api_hash)
+
+@app.on_message(filters.private)
+async def private_handler(client, message):
+    await message.reply("Это личное сообщение!")
+
+@app.on_message(filters.command("start"))
+async def start_command(client, message):
+    await message.reply("Привет! Я бот на Pyrogram")
+
+@app.on_message(filters.text & filters.group)
+async def group_text(client, message):
+    await message.reply(f"Вы написали: {message.text}")
+
+@app.on_callback_query()
+async def callback_handler(client, callback_query):
+    await callback_query.answer("Кнопка нажата!")
+    await callback_query.edit_message_text("Текст обновлен")
+
+app.run()
+
+ПРИМЕР КОДА (СИНХРОННЫЙ):
+from pyrogram import Client
+
+app = Client("my_account")
+
+with app:
+    # Получение информации о себе
+    me = app.get_me()
+    print(f"Привет, {me.first_name}!")
+    
+    # Отправка сообщения
+    app.send_message("username", "Hello from Pyrogram!")
+    
+    # Получение сообщений
+    messages = app.get_messages("username", limit=5)
+    for msg in messages:
+        print(msg.text)
+    
+    # Скачивание фото
+    messages = app.get_messages("username", limit=1)
+    if messages and messages[0].photo:
+        app.download_media(messages[0].photo, "photo.jpg")
+
+ПРИМЕР КОДА (БОТ):
+from pyrogram import Client, filters
+
+app = Client(
+    "my_bot",
+    api_id=12345,
+    api_hash="your_api_hash",
+    bot_token="YOUR_BOT_TOKEN"
+)
+
+@app.on_message(filters.command("help"))
+async def help_command(client, message):
+    await message.reply(
+        "Доступные команды:\n"
+        "/start - Начать\n"
+        "/help - Помощь\n"
+        "/info - Информация"
+    )
+
+@app.on_message(filters.command("info"))
+async def info_command(client, message):
+    user = message.from_user
+    await message.reply(
+        f"Ваше имя: {user.first_name}\n"
+        f"Ваш ID: {user.id}\n"
+        f"Username: @{user.username}" if user.username else ""
+    )
+
+app.run()

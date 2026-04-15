@@ -1,0 +1,75 @@
+Requests Documentation
+
+Requests is an elegant and simple HTTP library for Python.
+
+Basic Usage:
+import requests
+
+# GET request
+response = requests.get('https://api.example.com/data')
+data = response.json()
+
+# POST request
+response = requests.post('https://api.example.com/data', 
+
+                        json={'key': 'value'})
+data = response.json()
+
+# PUT request
+response = requests.put('https://api.example.com/data/1', 
+                       json={'key': 'new_value'})
+
+# DELETE request
+response = requests.delete('https://api.example.com/data/1')
+
+Response Handling:
+if response.status_code == 200:
+    data = response.json()
+    print(data)
+else:
+    print(f'Error: {response.status_code}')
+
+Key Methods:
+- requests.get(): GET requests
+- requests.post(): POST requests
+- requests.put(): PUT requests
+- requests.delete(): DELETE requests
+- requests.patch(): PATCH requests
+
+Parameters:
+- params: URL parameters (for GET)
+- json: JSON data (automatically sets Content-Type)
+- data: Form data
+- headers: Custom headers
+- timeout: Request timeout in seconds
+
+Headers:
+headers = {
+    'Authorization': 'Bearer token',
+    'Content-Type': 'application/json',
+    'User-Agent': 'MyApp/1.0'
+}
+
+response = requests.get('https://api.example.com', headers=headers)
+
+Error Handling:
+try:
+    response = requests.get('https://api.example.com', timeout=5)
+    response.raise_for_status()  # Raises exception for 4XX/5XX
+    data = response.json()
+except requests.exceptions.RequestException as e:
+    print(f'Request failed: {e}')
+
+Session Usage:
+session = requests.Session()
+session.headers.update({'Authorization': 'Bearer token'})
+
+response = session.get('https://api.example.com/data')
+
+Authentication:
+# Basic auth
+requests.get('https://api.example.com', auth=('user', 'pass'))
+
+# Bearer token
+headers = {'Authorization': 'Bearer token'}
+requests.get('https://api.example.com', headers=headers)

@@ -1,0 +1,251 @@
+Asyncio Documentation
+
+Asyncio is a Python library for writing concurrent code using the async/await syntax.
+
+Basic Concepts:
+import asyncio
+
+# Define async function
+async def main():
+    print('Hello')
+    await asyncio.sleep(1)
+    print('World')
+
+# Run async function
+asyncio.run(main())
+
+Coroutines:
+async def my_coroutine():
+    return 'Result'
+
+# Create coroutine
+coro = my_coroutine()
+
+# Run coroutine
+result = await coro
+result = asyncio.run(coro)
+
+Tasks:
+# Create task
+async def my_task():
+    await asyncio.sleep(1)
+    return 'Task done'
+
+async def main():
+    task = asyncio.create_task(my_task())
+    result = await task
+    print(result)
+
+asyncio.run(main())
+
+Multiple Tasks:
+async def task1():
+    await asyncio.sleep(1)
+    return 'Task 1'
+
+async def task2():
+    await asyncio.sleep(2)
+    return 'Task 2'
+
+async def main():
+    # Run tasks concurrently
+    results = await asyncio.gather(task1(), task2())
+    print(results)
+
+asyncio.run(main())
+
+# Run with timeout
+try:
+    results = await asyncio.wait_for(asyncio.gather(task1(), task2()), timeout=1.5)
+except asyncio.TimeoutError:
+    print('Tasks took too long')
+
+Event Loop:
+# Get current event loop
+loop = asyncio.get_event_loop()
+
+# Run coroutine
+loop.run_until_complete(my_coroutine())
+
+# Schedule coroutine
+loop.create_task(my_coroutine())
+
+# Close loop
+loop.close()
+
+Awaitable Objects:
+# Sleep
+await asyncio.sleep(1)
+
+# Wait for event
+event = asyncio.Event()
+await event.wait()
+
+# Wait for queue
+queue = asyncio.Queue()
+item = await queue.get()
+
+# Wait for lock
+lock = asyncio.Lock()
+async with lock:
+    # Critical section
+    pass
+
+Queues:
+async def producer(queue):
+    for i in range(5):
+        await queue.put(f'Item {i}')
+        await asyncio.sleep(0.1)
+
+async def consumer(queue):
+    while True:
+        item = await queue.get()
+        print(f'Got: {item}')
+        await asyncio.sleep(0.2)
+        queue.task_done()
+
+async def main():
+    queue = asyncio.Queue()
+    producer_task = asyncio.create_task(producer(queue))
+    consumer_task = asyncio.create_task(consumer(queue))
+    
+    await producer_task
+    await queue.join()
+    consumer_task.cancel()
+
+asyncio.run(main())
+
+Locks and Semaphores:
+async def worker(lock, name):
+    async with lock:
+        print(f'{name} has lock')
+        await asyncio.sleep(1)
+        print(f'{name} released lock')
+
+async def main():
+    lock = asyncio.Lock()
+    tasks = [asyncio.create_task(worker(lock, f'Worker {i}')) for i in range(3)]
+    await asyncio.gather(*tasks)
+
+asyncio.run(main())
+
+# Semaphore (limit concurrent access)
+semaphore = asyncio.Semaphore(3)
+
+async def limited_worker():
+    async with semaphore:
+        await asyncio.sleep(1)
+
+HTTP Requests with aiohttp:
+import aiohttp
+
+async def fetch_url(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def main():
+    urls = ['https://api.example.com/1', 'https://api.example.com/2']
+    
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_url(session, url) for url in urls]
+        results = await asyncio.gather(*tasks)
+        print(results)
+
+asyncio.run(main())
+
+Web Servers with aiohttp:
+from aiohttp import web
+
+async def handle(request):
+    return web.Response(text='Hello, World')
+
+async def main():
+    app = web.Application()
+    app.add_routes([web.get('/', handle)])
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, 'localhost', 8080)
+    await site.start()
+    print('Server started')
+    await asyncio.sleep(3600)  # Run for 1 hour
+
+asyncio.run(main())
+
+Database with asyncpg:
+import asyncpg
+
+async def fetch_users():
+    conn = await asyncpg.connect('postgresql://user:pass@localhost/db')
+    rows = await conn.fetch('SELECT * FROM users')
+    await conn.close()
+    return rows
+
+asyncio.run(fetch_users())
+
+Error Handling:
+async def might_fail():
+    await asyncio.sleep(0.1)
+    raise ValueError('Something went wrong')
+
+async def main():
+    try:
+        await might_fail()
+    except ValueError as e:
+        print(f'Caught error: {e}')
+
+asyncio.run(main())
+
+# Timeout handling
+async def with_timeout():
+    try:
+        await asyncio.wait_for(might_fail(), timeout=0.05)
+    except asyncio.TimeoutError:
+        print('Operation timed out')
+
+asyncio.run(with_timeout())
+
+Cancellation:
+async def long_running_task():
+    try:
+        for i in range(10):
+            print(f'Working {i}')
+            await asyncio.sleep(0.5)
+    except asyncio.CancelledError:
+        print('Task was cancelled')
+        raise
+
+async def main():
+    task = asyncio.create_task(long_running_task())
+    await asyncio.sleep(2)
+    task.cancel()
+    
+    try:
+        await task
+    except asyncio.CancelledError:
+        print('Main caught cancellation')
+
+asyncio.run(main())
+
+Subprocesses:
+async def run_command():
+    proc = await asyncio.create_subprocess_shell(
+        'ls -la',
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    
+    stdout, stderr = await proc.communicate()
+    print(f'Stdout: {stdout.decode()}')
+    print(f'Stderr: {stderr.decode()}')
+
+asyncio.run(run_command())
+
+Best Practices:
+- Use async/await instead of callbacks
+- Always use proper async libraries (aiohttp, asyncpg, etc.)
+- Handle cancellation properly
+- Use timeouts for external operations
+- Limit concurrent operations with semaphores
+- Use connection pooling for databases
+- Avoid blocking operations in async code
+- Use asyncio.run() for main entry point

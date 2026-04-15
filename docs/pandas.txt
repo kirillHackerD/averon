@@ -1,0 +1,129 @@
+========================================
+БИБЛИОТЕКА: pandas
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://pandas.pydata.org/docs/
+РЕПОЗИТОРИЙ: https://github.com/pandas-dev/pandas
+
+ОПИСАНИЕ:
+Мощная библиотека для анализа и обработки данных. Предоставляет
+высокоуровневые структуры данных (DataFrame, Series) и множество
+функций для манипуляции данными.
+
+ОСНОВНЫЕ СТРУКТУРЫ:
+- Series: Одномерный массив с метками (индексами)
+- DataFrame: Двумерная таблица с индексированными строками и столбцами
+
+ОСНОВНЫЕ ФУНКЦИИ СОЗДАНИЯ:
+- pd.Series(data, index=None) - Создать Series
+- pd.DataFrame(data, index=None, columns=None) - Создать DataFrame
+- pd.read_csv(filepath) - Чтение CSV файла
+- pd.read_excel(filepath) - Чтение Excel файла
+- pd.read_json(filepath) - Чтение JSON файла
+- pd.read_sql(sql, con) - Чтение из SQL базы данных
+
+ОСНОВНЫЕ МЕТОДЫ DataFrame:
+- df.head(n) - Первые n строк
+- df.tail(n) - Последние n строк
+- df.info() - Информация о DataFrame
+- df.describe() - Статистическое описание
+- df.shape - Размерность (строки, столбцы)
+- df.columns - Имена столбцов
+- df.index - Индексы строк
+- df.dtypes - Типы данных столбцов
+
+ВЫБОРКА ДАННЫХ:
+- df[column] - Выбор столбца (возвращает Series)
+- df[[col1, col2]] - Выбор нескольких столбцов
+- df.loc[row_label] - Выбор по метке
+- df.iloc[row_position] - Выбор по позиции
+- df.loc[rows, cols] - Выбор по меткам строк и столбцов
+- df.iloc[rows, cols] - Выбор по позициям строк и столбцов
+
+ФИЛЬТРАЦИЯ:
+- df[df['column'] > value] - Булева фильтрация
+- df.query('column > value') - Фильтрация с помощью выражения
+- df.isin(values) - Проверка на вхождение
+- df.isnull() / df.notnull() - Проверка на пропуски
+
+АГРЕГАЦИЯ И ГРУППИРОВКА:
+- df.groupby(column) - Группировка по столбцу
+- df.groupby(column).agg(['mean', 'sum', 'count']) - Агрегация
+- df.pivot_table(values, index, columns, aggfunc) - Сводная таблица
+
+ОБЪЕДИНЕНИЕ ДАННЫХ:
+- pd.concat([df1, df2]) - Конкатенация
+- df1.merge(df2, on='key') - Объединение (JOIN)
+- df1.join(df2) - Объединение по индексу
+
+РАБОТА С ПРОПУСКАМИ:
+- df.dropna() - Удалить строки с пропусками
+- df.fillna(value) - Заполнить пропуски
+- df.interpolate() - Интерполяция пропусков
+
+ОСНОВНЫЕ МЕТОДЫ:
+- df.sort_values(column) - Сортировка
+- df.apply(func) - Применить функцию
+- df.map(func) - Применить функцию к Series
+- df.to_csv() - Сохранить в CSV
+- df.to_excel() - Сохранить в Excel
+- df.to_json() - Сохранить в JSON
+
+УСТАНОВКА:
+pip install pandas
+
+ПРИМЕР КОДА:
+import pandas as pd
+
+# Создание DataFrame
+data = {
+    'name': ['Иван', 'Мария', 'Петр', 'Анна', 'Сергей'],
+    'age': [25, 30, 28, 35, 26],
+    'city': ['Москва', 'СПб', 'Новосибирск', 'Москва', 'СПб'],
+    'salary': [50000, 60000, 55000, 70000, 48000]
+}
+df = pd.DataFrame(data)
+print(df.head())
+
+# Основная информация
+print(df.info())
+print(df.describe())
+
+# Фильтрация
+moscow_df = df[df['city'] == 'Москва']
+print(moscow_df)
+
+# Фильтрация по нескольким условиям
+young_high_salary = df[(df['age'] < 30) & (df['salary'] > 50000)]
+print(young_high_salary)
+
+# Группировка и агрегация
+grouped = df.groupby('city').agg({
+    'salary': ['mean', 'min', 'max'],
+    'age': 'mean'
+})
+print(grouped)
+
+# Добавление столбца
+df['bonus'] = df['salary'] * 0.1
+print(df)
+
+# Сортировка
+sorted_df = df.sort_values('salary', ascending=False)
+print(sorted_df)
+
+# Применение функции
+df['salary_category'] = df['salary'].apply(
+    lambda x: 'high' if x > 60000 else 'medium' if x > 50000 else 'low'
+)
+print(df)
+
+# Чтение и запись файлов
+df.to_csv('data.csv', index=False)
+df.to_excel('data.xlsx', index=False)
+
+# Чтение из файла
+df_read = pd.read_csv('data.csv')
+print(df_read)

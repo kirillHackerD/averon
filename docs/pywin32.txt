@@ -1,0 +1,106 @@
+========================================
+БИБЛИОТЕКА: pywin32
+========================================
+
+ТИП: Сторонняя библиотека
+ЯЗЫК: Python
+ОФИЦИАЛЬНАЯ ДОКУМЕНТАЦИЯ: https://mhammond.github.io/pywin32/
+РЕПОЗИТОРИЙ: https://github.com/mhammond/pywin32
+
+ОПИСАНИЕ:
+Набор Python-оберток для Windows API. Предоставляет доступ к множеству
+функций Windows, включая COM, Win32 API, регистр Windows и другие.
+
+ОСНОВНЫЕ МОДУЛИ:
+- win32api: Основные функции Windows API
+- win32con: Константы Windows API
+- win32com.client: Работа с COM объектами
+- win32file: Работа с файлами и папками
+- win32process: Управление процессами
+- win32event: Работа с событиями
+- win32service: Управление службами Windows
+- win32print: Работа с принтерами
+- win32gui: Работа с GUI окнами
+- win32registry: Работа с реестром Windows
+- win32security: Работа с безопасностью
+- win32net: Работа с сетью
+
+ОСНОВНЫЕ ФУНКЦИИ:
+- win32api.GetSystemMetrics() - Получить параметры системы
+- win32api.MessageBox() - Отобразить диалоговое окно
+- win32api.GetComputerName() - Получить имя компьютера
+- win32api.GetUserName() - Получить имя пользователя
+- win32api.ShellExecute() - Запустить программу
+- win32file.CreateFile() - Создать/открыть файл
+- win32file.ReadFile() - Чтение из файла
+- win32file.WriteFile() - Запись в файл
+- win32process.CreateProcess() - Создать процесс
+- win32com.client.Dispatch() - Создать COM объект
+
+ОСНОВНЫЕ КОНСТАНТЫ:
+- win32con.MB_OK - Кнопка OK в MessageBox
+- win32con.MB_YESNO - Кнопки Yes/No
+- win32con.MB_ICONERROR - Иконка ошибки
+- win32con.MB_ICONQUESTION - Иконка вопроса
+- win32con.MB_ICONINFORMATION - Иконка информации
+
+РАБОТА С РЕЕСТРОМ:
+- win32api.RegOpenKey() - Открыть ключ реестра
+- win32api.RegQueryValueEx() - Прочитать значение
+- win32api.RegSetValueEx() - Записать значение
+- win32api.RegCloseKey() - Закрыть ключ
+
+УСТАНОВКА:
+pip install pywin32
+
+ВНИМАНИЕ:
+После установки может потребоваться запуск:
+python Scripts/pywin32_postinstall.py -install
+
+ПРИМЕР КОДА:
+import win32api
+import win32con
+import win32com.client
+import win32file
+
+# MessageBox
+win32api.MessageBox(
+    0, 
+    "Сообщение для пользователя", 
+    "Заголовок окна", 
+    win32con.MB_OK | win32con.MB_ICONINFORMATION
+)
+
+# Информация о системе
+print(f"Компьютер: {win32api.GetComputerName()}")
+print(f"Пользователь: {win32api.GetUserName()}")
+
+# Работа с реестром
+import win32api
+key = win32api.RegOpenKey(
+    win32con.HKEY_CURRENT_USER, 
+    "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+)
+try:
+    value, type = win32api.RegQueryValueEx(key, "MyApp")
+    print(f"Значение: {value}")
+except:
+    print("Ключ не найден")
+win32api.RegCloseKey(key)
+
+# COM объект (например, Excel)
+excel = win32com.client.Dispatch("Excel.Application")
+excel.Visible = True
+workbook = excel.Workbooks.Add()
+sheet = workbook.Worksheets(1)
+sheet.Cells(1, 1).Value = "Привет из Python!"
+
+# Запуск программы
+win32api.ShellExecute(
+    0, 
+    "open", 
+    "notepad.exe", 
+    "", 
+    "", 
+    1
+)

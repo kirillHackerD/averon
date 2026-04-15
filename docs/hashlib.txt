@@ -1,0 +1,167 @@
+Hashlib Module Documentation
+
+Secure hash and message digest algorithms. Built-in Python library.
+
+Basic Hashing:
+import hashlib
+
+# Create SHA-256 hash
+sha256_hash = hashlib.sha256(b"Hello World").hexdigest()
+print(sha256_hash)
+
+# Create MD5 hash
+md5_hash = hashlib.md5(b"Hello World").hexdigest()
+print(md5_hash)
+
+# Create SHA-1 hash
+sha1_hash = hashlib.sha1(b"Hello World").hexdigest()
+print(sha1_hash)
+
+Available Algorithms:
+hashlib.sha256()  # SHA-256
+hashlib.sha512()  # SHA-512
+hashlib.sha1()    # SHA-1 (not secure)
+hashlib.md5()     # MD5 (not secure)
+hashlib.blake2b() # BLAKE2b
+hashlib.blake2s() # BLAKE2s
+
+Incremental Hashing:
+import hashlib
+
+hash_obj = hashlib.sha256()
+hash_obj.update(b"Hello ")
+hash_obj.update(b"World")
+result = hash_obj.hexdigest()
+print(result)
+
+# Same as
+hashlib.sha256(b"Hello World").hexdigest()
+
+Hashing Files:
+import hashlib
+
+def hash_file(filename, algorithm='sha256'):
+    """Calculate hash of a file."""
+    h = hashlib.new(algorithm)
+    with open(filename, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+# Usage
+file_hash = hash_file('document.pdf')
+print(f"SHA-256: {file_hash}")
+
+# Verify file integrity
+original_hash = "abc123..."
+calculated_hash = hash_file('document.pdf')
+if calculated_hash == original_hash:
+    print("File is authentic")
+else:
+    print("File has been modified")
+
+Hashing Strings:
+import hashlib
+
+def hash_string(text, algorithm='sha256'):
+    """Hash a string."""
+    encoded = text.encode('utf-8')
+    return hashlib.new(algorithm, encoded).hexdigest()
+
+# Usage
+password_hash = hash_string("user_password")
+print(password_hash)
+
+Checking Available Algorithms:
+import hashlib
+
+# Guaranteed to exist
+guaranteed = hashlib.algorithms_guaranteed
+print(guaranteed)
+
+# All available on this platform
+available = hashlib.algorithms_available
+print(available)
+
+Secure Password Hashing (with salt):
+import hashlib
+import os
+
+def hash_password(password, salt=None):
+    """Hash password with salt using SHA-256."""
+    if salt is None:
+        salt = os.urandom(32)  # 256-bit salt
+    
+    # Combine password and salt
+    salted_password = salt + password.encode('utf-8')
+    
+    # Hash multiple times (key stretching)
+    hash_value = salted_password
+    for _ in range(100000):  # 100k iterations
+        hash_value = hashlib.sha256(hash_value).digest()
+    
+    return salt, hash_value
+
+# Usage
+salt, hashed = hash_password("my_secure_password")
+
+# Verify
+salt2, hashed2 = hash_password("my_secure_password", salt)
+if hashed == hashed2:
+    print("Password correct")
+
+Using BLAKE2:
+import hashlib
+
+# BLAKE2b (optimized for 64-bit)
+hash_blake2b = hashlib.blake2b(b"Hello World").hexdigest()
+print(hash_blake2b)
+
+# BLAKE2s (optimized for 32-bit)
+hash_blake2s = hashlib.blake2s(b"Hello World").hexdigest()
+print(hash_blake2s)
+
+# With key (MAC)
+key = b'secret_key'
+hash_with_key = hashlib.blake2b(b"message", key=key).hexdigest()
+
+HMAC (Hash-based Message Authentication):
+import hmac
+import hashlib
+
+# Create HMAC
+key = b'secret_key'
+message = b'Hello World'
+
+h = hmac.new(key, message, hashlib.sha256)
+signature = h.hexdigest()
+print(signature)
+
+# Verify
+h2 = hmac.new(key, message, hashlib.sha256)
+if hmac.compare_digest(h2.hexdigest(), signature):
+    print("Valid HMAC")
+
+Getting Raw Digest:
+import hashlib
+
+# Get bytes instead of hex string
+hash_bytes = hashlib.sha256(b"Hello").digest()
+print(hash_bytes)
+
+# Get hex
+hash_hex = hashlib.sha256(b"Hello").hexdigest()
+print(hash_hex)
+
+# Get digest size
+h = hashlib.sha256()
+print(h.digest_size)  # 32 bytes
+
+Best Practices:
+- Use SHA-256 or better for security
+- Avoid MD5 and SHA-1 (cryptographically broken)
+- Use salt for password hashing
+- Consider bcrypt or Argon2 for passwords (not in hashlib)
+- Use HMAC for message authentication
+- Use BLAKE2 for fast hashing
+- Always use constant-time comparison for MACs
