@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Averon AI — Подтверждение email</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0d0c;--surface:#161412;--border:rgba(255,255,255,0.07);
+  --text:#f0ebe4;--muted:#6b6159;--accent:#e8784a;--accent2:#f0a875;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;position:relative}
+
+.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-g{position:absolute;border-radius:50%;filter:blur(120px)}
+.bg-g1{width:500px;height:500px;background:radial-gradient(circle,#e8784a,transparent 70%);top:-180px;right:-80px;opacity:.1;animation:d1 18s ease-in-out infinite}
+.bg-g2{width:400px;height:400px;background:radial-gradient(circle,#7c5af0,transparent 70%);bottom:-150px;left:-100px;opacity:.06;animation:d2 22s ease-in-out infinite}
+@keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,30px)}}
+@keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+
+.card{position:relative;z-index:1;width:420px;max-width:94vw;animation:up .5s cubic-bezier(.22,1,.36,1) both}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:36px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#e8784a,#f0a875);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(232,120,74,.35)}
+.logo-mark svg{width:18px;height:18px;color:#fff}
+.logo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+
+.surface{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px}
+
+.icon-wrap{display:flex;justify-content:center;margin-bottom:20px}
+.icon-circle{width:56px;height:56px;border-radius:50%;background:rgba(232,120,74,.12);border:1px solid rgba(232,120,74,.25);display:flex;align-items:center;justify-content:center}
+.icon-circle svg{color:var(--accent)}
+
+h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;text-align:center;margin-bottom:8px;letter-spacing:-.3px}
+.sub{font-size:13.5px;color:var(--muted);text-align:center;line-height:1.55;margin-bottom:28px;font-weight:300}
+.sub strong{color:var(--text2,#c5c5c5);font-weight:500}
+
+/* Code inputs */
+.code-row{display:flex;gap:10px;justify-content:center;margin-bottom:24px}
+.code-row input{
+  width:48px;height:56px;text-align:center;font-size:22px;font-weight:600;
+  font-family:'Syne',sans-serif;letter-spacing:0;
+  background:rgba(255,255,255,0.04);border:1.5px solid var(--border);
+  border-radius:10px;color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+  caret-color:var(--accent);
+}
+.code-row input:focus{border-color:rgba(232,120,74,.6);background:rgba(232,120,74,.05);box-shadow:0 0 0 3px rgba(232,120,74,.1)}
+
+.err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5;font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:18px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
+.ok{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);color:#86efac;font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:18px;text-align:center}
+
+.btn{
+  width:100%;padding:13px;background:linear-gradient(135deg,#e8784a,#d45f2e);
+  color:#fff;border:none;border-radius:11px;font:500 14px 'DM Sans',sans-serif;
+  cursor:pointer;transition:opacity .15s,transform .15s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(232,120,74,.3);
+}
+.btn:hover{opacity:.91;transform:translateY(-1px);box-shadow:0 8px 28px rgba(232,120,74,.4)}
+.btn:active{transform:translateY(0)}
+
+.resend-row{display:flex;align-items:center;justify-content:center;margin-top:18px;gap:6px;font-size:13px;color:var(--muted)}
+.resend-row button{background:none;border:none;color:var(--accent2);font:500 13px 'DM Sans',sans-serif;cursor:pointer;transition:color .15s;padding:0}
+.resend-row button:hover{color:var(--accent);text-decoration:underline}
+
+.footer{text-align:center;font-size:11px;color:#2e2925;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="bg-layer">
+  <div class="bg-g bg-g1"></div>
+  <div class="bg-g bg-g2"></div>
+</div>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <span class="logo-name">Averon AI</span>
+  </div>
+
+  <div class="surface">
+    <div class="icon-wrap">
+      <div class="icon-circle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+    </div>
+
+    <h2>Подтверди email</h2>
+    <p class="sub">Мы отправили 6-значный код на<br><strong>{{ masked }}</strong><br>Введи его ниже. Код действует 15 минут.</p>
+
+    {% if error %}<div class="err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{{ error }}</div>{% endif %}
+    {% if resent %}<div class="ok">✓ Новый код отправлен на почту</div>{% endif %}
+
+    <form method="POST" action="/verify-email" id="verifyForm">
+      <input type="hidden" name="action" value="verify">
+      <div class="code-row" id="codeRow">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="digit" autocomplete="off">
+      </div>
+      <input type="hidden" name="code" id="codeInput">
+      <button class="btn" type="submit">Подтвердить →</button>
+    </form>
+
+    <div class="resend-row">
+      <span>Не получил письмо?</span>
+      <form method="POST" action="/verify-email" style="display:inline">
+        <input type="hidden" name="action" value="resend">
+        <button type="submit">Отправить ещё раз</button>
+      </form>
+    </div>
+  </div>
+  <p class="footer">Averon AI · by geekom</p>
+</div>
+
+<script>
+const digits = document.querySelectorAll('.digit');
+const codeInput = document.getElementById('codeInput');
+
+digits.forEach((inp, i) => {
+  inp.addEventListener('input', e => {
+    const v = e.target.value.replace(/\D/g,'');
+    e.target.value = v;
+    if (v && i < digits.length - 1) digits[i+1].focus();
+    syncCode();
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !e.target.value && i > 0) digits[i-1].focus();
+    if (e.key === 'ArrowLeft' && i > 0) digits[i-1].focus();
+    if (e.key === 'ArrowRight' && i < digits.length-1) digits[i+1].focus();
+  });
+  inp.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+    text.split('').forEach((ch,j) => { if(digits[j]) digits[j].value = ch; });
+    if (digits[text.length - 1]) digits[text.length - 1].focus();
+    syncCode();
+  });
+});
+
+function syncCode() {
+  codeInput.value = Array.from(digits).map(d => d.value).join('');
+}
+
+// auto-submit when all 6 filled
+document.getElementById('verifyForm').addEventListener('input', () => {
+  if (Array.from(digits).every(d => d.value)) {
+    syncCode();
+    document.getElementById('verifyForm').submit();
+  }
+});
+
+digits[0].focus();
+</script>
+</body>
+</html>

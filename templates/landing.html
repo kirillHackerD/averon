@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Averon 4 — geekom AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0e0d0c;
+  --bg2:#161412;
+  --bg3:#1c1a18;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:#f0ebe4;
+  --text2:#c4bdb7;
+  --muted:#6b6159;
+  --muted2:#3d3530;
+  --accent:#e8784a;
+  --accent2:#f0a875;
+  --flash:#19c37d;
+  --codex:#ff6b6b;
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── BACKGROUND ── */
+.scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(140px)}
+.o1{width:800px;height:800px;background:radial-gradient(circle,#e8784a,transparent 65%);top:-320px;right:-200px;opacity:.09;animation:ob1 20s ease-in-out infinite}
+.o2{width:600px;height:600px;background:radial-gradient(circle,#7c5af0,transparent 65%);bottom:-280px;left:-180px;opacity:.06;animation:ob2 26s ease-in-out infinite}
+.o3{width:400px;height:400px;background:radial-gradient(circle,#19c37d,transparent 65%);top:55%;left:60%;transform:translate(-50%,-50%);opacity:.04;animation:ob3 18s ease-in-out infinite}
+@keyframes ob1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-40px,50px) scale(1.06)}66%{transform:translate(30px,-30px) scale(.95)}}
+@keyframes ob2{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-40px) scale(1.1)}}
+@keyframes ob3{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.04}50%{transform:translate(-50%,-50%) scale(1.4);opacity:.07}}
+
+/* noise */
+.scene::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.022;mix-blend-mode:overlay}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;background:rgba(14,13,12,.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(232,120,74,.3)}
+.logo-mark svg{width:15px;height:15px;color:#fff}
+.logo-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text)}
+.nav-links{display:flex;gap:2px}
+.nav-links a{font-size:13.5px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px;transition:color .15s,background .15s;font-weight:400}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nav-cta{display:flex;gap:8px;flex-shrink:0}
+.btn-ghost{padding:8px 16px;border-radius:9px;font:500 13.5px 'DM Sans',sans-serif;text-decoration:none;color:var(--muted);background:transparent;border:1px solid var(--border);transition:all .15s;cursor:pointer}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.04)}
+.btn-accent{padding:8px 18px;border-radius:9px;font:500 13.5px 'DM Sans',sans-serif;text-decoration:none;color:#fff;background:linear-gradient(135deg,var(--accent),#d45f2e);transition:all .15s;box-shadow:0 3px 14px rgba(232,120,74,.28);cursor:pointer;border:none}
+.btn-accent:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 22px rgba(232,120,74,.38)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;padding:80px 28px}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+
+.hero-label{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(232,120,74,.1);border:1px solid rgba(232,120,74,.25);border-radius:99px;font-size:12px;font-weight:500;color:var(--accent2);margin-bottom:24px;letter-spacing:.3px}
+.hero-label span{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+h1{font-family:'Syne',sans-serif;font-size:clamp(38px,5.5vw,62px);font-weight:800;line-height:1.05;letter-spacing:-1.5px;margin-bottom:22px}
+.grad{background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,#f5d08a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.65;font-weight:300;margin-bottom:36px;max-width:460px}
+
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.btn-big{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:12px;font:500 15px 'DM Sans',sans-serif;text-decoration:none;transition:all .2s;cursor:pointer;border:none}
+.btn-primary-big{background:linear-gradient(135deg,var(--accent),#d45f2e);color:#fff;box-shadow:0 5px 24px rgba(232,120,74,.35)}
+.btn-primary-big:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 10px 32px rgba(232,120,74,.45)}
+.btn-outline-big{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline-big:hover{color:var(--text);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
+
+.hero-stats{display:flex;gap:32px}
+.stat{display:flex;flex-direction:column;gap:3px}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.stat-lbl{font-size:12.5px;color:var(--muted);font-weight:300}
+
+/* ── CHAT DEMO ── */
+.chat-demo{background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);animation:floatDemo 6s ease-in-out infinite}
+@keyframes floatDemo{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.cd-bar{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg3)}
+.cd-dots{display:flex;gap:5px}
+.cd-dots span{width:10px;height:10px;border-radius:50%}
+.cd-dots .r{background:#ff6058}.cd-dots .y{background:#febc2e}.cd-dots .g{background:#27c940}
+.cd-title{font-size:12.5px;color:var(--muted);font-weight:500;margin-left:4px}
+.cd-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.cd-msg{display:flex;flex-direction:column;gap:4px;max-width:85%}
+.cd-msg.user{align-self:flex-end;align-items:flex-end}
+.cd-msg.ai{align-self:flex-start}
+.cd-bubble{padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55}
+.cd-msg.user .cd-bubble{background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--text2);border-radius:14px 14px 4px 14px}
+.cd-msg.ai .cd-bubble{background:transparent;color:var(--text2);border-radius:4px 14px 14px 14px;padding:0}
+.cd-name{font-size:11px;color:var(--muted);padding:0 4px}
+.cd-code{background:#0d0d0d;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'Fira Code','Cascadia Code',monospace;font-size:11.5px;line-height:1.6;color:#c9d1d9;margin-top:6px;overflow:hidden}
+.cd-code .k{color:#ff7b72}.cd-code .s{color:#a5d6ff}.cd-code .c{color:#8b949e;font-style:italic}.cd-code .fn{color:#d2a8ff}
+.cd-typing{display:flex;gap:4px;align-items:center;padding:10px 14px}
+.cd-typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:blink 1.3s ease infinite}
+.cd-typing span:nth-child(2){animation-delay:.2s}.cd-typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.2;transform:scale(.8)}30%{opacity:1;transform:scale(1.1)}}
+
+/* ── SECTION COMMON ── */
+section{position:relative;z-index:1}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+.sec-head{text-align:center;margin-bottom:60px}
+.sec-tag{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:rgba(232,120,74,.1);border:1px solid rgba(232,120,74,.2);padding:4px 12px;border-radius:99px;margin-bottom:14px}
+.sec-head h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.sec-head p{font-size:16px;color:var(--muted);font-weight:300;max-width:500px;margin:0 auto;line-height:1.65}
+
+/* ── FEATURES ── */
+.features{padding:120px 0}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.feat{background:var(--bg);padding:32px 28px;transition:background .2s}
+.feat:hover{background:var(--bg2)}
+.feat-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;flex-shrink:0}
+.feat h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-.2px}
+.feat p{font-size:13.5px;color:var(--muted);line-height:1.65;font-weight:300}
+
+/* ── MODELS ── */
+.models{padding:0 0 120px}
+.models-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.model{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color .2s,transform .2s}
+.model:hover{border-color:var(--border2);transform:translateY(-3px)}
+.model-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.model-chip{font-size:12px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:99px}
+.chip-flash{background:rgba(25,195,125,.12);color:var(--flash);border:1px solid rgba(25,195,125,.25)}
+.chip-codex{background:rgba(255,107,107,.12);color:var(--codex);border:1px solid rgba(255,107,107,.25)}
+.model-tag{font-size:11px;color:var(--muted);font-weight:300}
+.model h3{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+.model-desc{font-size:13.5px;color:var(--muted);line-height:1.6;font-weight:300;margin-bottom:20px}
+.model-feats{list-style:none;display:flex;flex-direction:column;gap:7px}
+.model-feats li{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text2)}
+.model-feats li::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.model.flash .model-feats li::before{background:var(--flash)}
+.model.codex .model-feats li::before{background:var(--codex)}
+.model-limit{margin-top:18px;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px}
+.limit-free{background:rgba(25,195,125,.06);border:1px solid rgba(25,195,125,.15);color:var(--flash)}
+.limit-codex{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.15);color:var(--codex)}
+
+/* ── PRICING ── */
+.pricing{padding:0 0 120px}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:720px;margin:0 auto}
+.plan{background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:32px;position:relative;overflow:hidden}
+.plan.pro{border-color:rgba(59,130,246,.35);background:linear-gradient(160deg,rgba(59,130,246,.06) 0%,var(--bg2) 55%)}
+.plan.pro::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.plan-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.plan-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700}
+.plan-chip{font-size:11px;font-weight:600;letter-spacing:.4px;padding:3px 10px;border-radius:99px}
+.chip-free2{background:rgba(255,255,255,.07);color:var(--muted)}
+.chip-pro{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.plan-price{margin-bottom:24px}
+.plan-price .amount{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;letter-spacing:-2px;color:var(--text)}
+.plan-price .amt-free{font-size:24px;color:var(--muted);font-weight:600}
+.plan-price .per{font-size:14px;color:var(--muted);font-weight:300;margin-left:3px}
+.plan-rows{display:flex;flex-direction:column;gap:9px;margin-bottom:28px}
+.plan-row{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.plan-row.on{color:var(--text2)}
+.plan-row.off{color:var(--muted2)}
+.plan-row svg{flex-shrink:0}
+.btn-plan-cta{display:block;width:100%;padding:13px;border-radius:12px;text-align:center;font:600 14px 'Syne',sans-serif;letter-spacing:.2px;text-decoration:none;cursor:pointer;border:none;transition:all .2s}
+.cta-free{background:rgba(255,255,255,.06);color:var(--muted);cursor:default}
+.cta-pro{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,.3)}
+.cta-pro:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 28px rgba(59,130,246,.42)}
+
+/* ── CTA SECTION ── */
+.cta-sec{padding:0 0 140px}
+.cta-box{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:72px 48px;text-align:center;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:500px;height:400px;background:radial-gradient(circle,rgba(232,120,74,.12),transparent 65%);pointer-events:none}
+.cta-box h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:16px;position:relative}
+.cta-box p{font-size:16px;color:var(--muted);font-weight:300;margin-bottom:36px;position:relative;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;margin-bottom:20px}
+.cta-note{font-size:12.5px;color:var(--muted2);position:relative}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:28px;position:relative;z-index:1}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.footer-logo .logo-mark{width:26px;height:26px;border-radius:7px}
+.footer-logo .logo-mark svg{width:12px;height:12px}
+.footer-logo span{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text)}
+footer p{font-size:12px;color:var(--muted2)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12.5px;color:var(--muted2);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--muted)}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .chat-demo{max-width:480px;margin:0 auto}
+  .feat-grid{grid-template-columns:repeat(2,1fr)}
+  .models-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:420px}
+}
+@media(max-width:600px){
+  .nav-links{display:none}
+  .hero{padding:60px 20px}
+  .feat-grid{grid-template-columns:1fr}
+  .wrap{padding:0 20px}
+  .cta-box{padding:48px 24px}
+  .hero-stats{gap:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-name">Averon 4</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Возможности</a>
+      <a href="#models">Модели</a>
+      <a href="#pricing">Тарифы</a>
+    </div>
+    <div class="nav-cta">
+      <a href="{{ url_for('login') }}" class="btn-ghost">Войти</a>
+      <a href="{{ url_for('register') }}" class="btn-accent">Начать →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-label">
+        <span></span>
+        Averon 4 - Новая эра в км
+      </div>
+      <h1>ИИ-помощник<br>специально <span class="grad">для км</span></h1>
+      <p class="hero-sub">Пиши код, анализируй данные, создавай контент. Три модели под разные задачи — от быстрых ответов до глубокого программирования и 0 цензуры.</p>
+      <div class="hero-btns">
+        <a href="{{ url_for('register') }}" class="btn-big btn-primary-big">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          Начать бесплатно
+        </a>
+        <a href="#features" class="btn-big btn-outline-big">Узнать больше</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-val">3</span><span class="stat-lbl">ИИ модели</span></div>
+        <div class="stat"><span class="stat-val">24/7</span><span class="stat-lbl">Доступность</span></div>
+        <div class="stat"><span class="stat-val">∞</span><span class="stat-lbl">Flash запросов</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="chat-demo">
+        <div class="cd-bar">
+          <div class="cd-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+          <span class="cd-title">Averon 4 · Codex</span>
+        </div>
+        <div class="cd-body">
+          <div class="cd-msg user">
+            <span class="cd-name">Ты</span>
+            <div class="cd-bubble">Напиши async парсер на Python с retry логикой</div>
+          </div>
+          <div class="cd-msg ai">
+            <span class="cd-name">Averon Codex</span>
+            <div class="cd-bubble">
+              <div class="cd-code"><span class="k">import</span> asyncio, aiohttp<br><span class="k">from</span> bs4 <span class="k">import</span> BeautifulSoup<br><br><span class="k">async def</span> <span class="fn">fetch</span>(url, retries=<span class="s">3</span>):<br>&nbsp;&nbsp;<span class="k">async with</span> aiohttp.ClientSession() <span class="k">as</span> s:<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">for</span> i <span class="k">in</span> range(retries):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">try</span>:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r = <span class="k">await</span> s.get(url)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">return await</span> r.text()<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">except</span> Exception:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">await</span> asyncio.sleep(<span class="s">2**</span>i)</div>
+            </div>
+          </div>
+          <div class="cd-msg ai">
+            <div class="cd-typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Возможности</div>
+      <h2>Всё что нужно — в одном месте</h2>
+      <p>От простых вопросов до сложной разработки — Averon справляется с любой задачей</p>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(102,126,234,.15);border:1px solid rgba(102,126,234,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Программирование</h3>
+        <p>Пишет готовый код на любом ЯП. Помогает в отладке, обнаружении уязвимостей и старту проекта.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(232,120,74,.12);border:1px solid rgba(232,120,74,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f0a875" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Поиск в сети</h3>
+        <p>Берет актуальные данные из интернета прямо в ответе. Погода, курсы валют, новости — в реальном времени.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(79,172,254,.12);border:1px solid rgba(79,172,254,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+        <h3>Математика</h3>
+        <p>Формулы, графики функций, решения задач. Программа от 1 класса до проффесорского уровня.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.22)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.44-3.14z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.44-3.14z"/></svg>
+        </div>
+        <h3>Мышление</h3>
+        <p>Режим мышления - режим глубокого анализа и концентрации перед ответом. Это хорошо ибо ИИ понимает контекст задачи более гибко.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.22)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Анализ файлов</h3>
+        <p>Загружай код, CSV, текст. Averon читает и анализирует всё что ты прикрепишь.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.22)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <h3>Память</h3>
+        <p>Запоминает твои предпочтения, имя, проекты. Каждый следующий разговор умнее предыдущего. Можно выключить в настройках</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELS -->
+<section id="models" class="models">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Модели</div>
+      <h2>Три модели под разные задачи</h2>
+      <p>Переключайся между режимами — каждый заточен под своё</p>
+    </div>
+    <div class="models-grid reveal">
+      <div class="model flash">
+        <div class="model-top">
+          <span class="model-chip chip-flash">Flash</span>
+          <span class="model-tag">Быстрая</span>
+        </div>
+        <h3>Для всего и сразу</h3>
+        <p class="model-desc">Мгновенные ответы, советы, объяснения. Идеально для повседневного общения и несложных задач.</p>
+        <ul class="model-feats">
+          <li>Молниеносные ответы</li>
+          <li>Общение и советы</li>
+          <li>Анализ фото</li>
+          <li>Объяснения простым языком</li>
+          <li>Лёгкий код и скрипты</li>
+        </ul>
+        <div class="model-limit limit-free">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Безлимитно · Бесплатно
+        </div>
+      </div>
+      <div class="model codex">
+        <div class="model-top">
+          <span class="model-chip chip-codex">Codex</span>
+          <span class="model-tag">Для разработчиков</span>
+        </div>
+        <h3>Проф кодер</h3>
+        <p class="model-desc">Глубокий анализ кода, архитектура систем, дебаггинг сложных ошибок. С reasoning — думает вслух.</p>
+        <ul class="model-feats">
+          <li>Production-ready код</li>
+          <li>Ревью и рефакторинг</li>
+          <li>Архитектура и паттерны</li>
+          <li>К сожалению без анализа фото</li>
+          <li>Все языки и фреймворки</li>
+        </ul>
+        <div class="model-limit limit-codex">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          20 запросов/день · Безлимит с Pro
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Тарифы</div>
+      <h2>Просто. Честно. Без сюрпризов.</h2>
+      <p>Начни бесплатно — переходи на Pro когда захочешь больше</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="plan free">
+        <div class="plan-header-row">
+          <span class="plan-name">Free</span>
+          <span class="plan-chip chip-free2">Бесплатно</span>
+        </div>
+        <div class="plan-price"><span class="amt-free">Бесплатно</span></div>
+        <div class="plan-rows">
+          <div class="plan-row on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Flash — безлимит</div>
+          <div class="plan-row off"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Codex — 20 запросов/день</div>
+        </div>
+        <a href="{{ url_for('register') }}" class="btn-plan-cta cta-free">Текущий план</a>
+      </div>
+      <div class="plan pro">
+        <div class="plan-header-row">
+          <span class="plan-name">Pro</span>
+          <span class="plan-chip chip-pro">Pro</span>
+        </div>
+        <div class="plan-price"><span class="amount">$20</span><span class="per">/ месяц</span></div>
+        <div class="plan-rows">
+          <div class="plan-row on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Flash — безлимит</div>
+          <div class="plan-row on"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Codex — безлимит</div>
+        </div>
+        <a href="/pricing" class="btn-plan-cta cta-pro">Оформить за $20 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <h2>Готов попробовать?</h2>
+      <p>Регистрация за 30 секунд. Flash — сразу бесплатно и без ограничений.</p>
+      <div class="cta-btns">
+        <a href="{{ url_for('register') }}" class="btn-big btn-primary-big">Создать аккаунт →</a>
+        <a href="{{ url_for('login') }}" class="btn-big btn-outline-big">Войти</a>
+      </div>
+      <p class="cta-note">Бесплатно. Без денег</карты>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="/" class="footer-logo">
+      <span>Averon AI</span>
+    </a>
+    <p>© 2026 Averon AI · by geekom</p>
+    <div class="footer-links">
+      <a href="#features">Возможности</a>
+      <a href="#models">Модели</a>
+      <a href="/pricing">Тарифы</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Animate typing demo
+const phrases = [
+  'Напиши async парсер на Python с retry логикой',
+  'Разбери этот код и найди уязвимости',
+  'Создай REST API на FastAPI с JWT авторизацией',
+  'Оптимизируй этот SQL запрос',
+];
+let pi = 0;
+function cycleDemo() {
+  const bubble = document.querySelector('.cd-msg.user .cd-bubble');
+  if (!bubble) return;
+  bubble.style.opacity = '0';
+  bubble.style.transform = 'translateY(6px)';
+  setTimeout(() => {
+    pi = (pi + 1) % phrases.length;
+    bubble.textContent = phrases[pi];
+    bubble.style.transition = 'opacity .4s, transform .4s';
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateY(0)';
+  }, 300);
+}
+setInterval(cycleDemo, 4000);
+</script>
+</body>
+</html>

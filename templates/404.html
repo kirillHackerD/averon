@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Страница не найдена</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Animated mesh gradient background */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), transparent),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(255, 119, 198, 0.15), transparent),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(99, 102, 241, 0.2), transparent),
+    linear-gradient(180deg, #0a0a0a 0%, #111 50%, #1a1a1a 100%);
+  filter: blur(0px);
+}
+
+.bg-mesh::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.3) 0%, transparent 40%);
+  animation: meshMove 20s ease infinite;
+  opacity: 0.6;
+}
+
+@keyframes meshMove {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+/* Noise overlay */
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Scanlines */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+}
+
+/* Main container */
+.container {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px;
+}
+
+/* Glitch text container */
+.glitch-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(140px, 25vw, 320px);
+  font-weight: 700;
+  line-height: 0.85;
+  color: #fff;
+  position: relative;
+  text-shadow: 
+    0 0 20px rgba(255,255,255,0.1),
+    0 0 40px rgba(255,255,255,0.05);
+  animation: glitch-skew 3s infinite linear alternate-reverse;
+}
+
+.glitch::before,
+.glitch::after {
+  content: '404';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00ff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00ffff;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(31px, 9999px, 94px, 0); }
+  20% { clip: rect(78px, 9999px, 21px, 0); }
+  40% { clip: rect(12px, 9999px, 6px, 0); }
+  60% { clip: rect(65px, 9999px, 89px, 0); }
+  80% { clip: rect(34px, 9999px, 16px, 0); }
+  100% { clip: rect(92px, 9999px, 45px, 0); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(65px, 9999px, 99px, 0); }
+  20% { clip: rect(8px, 9999px, 46px, 0); }
+  40% { clip: rect(54px, 9999px, 13px, 0); }
+  60% { clip: rect(23px, 9999px, 76px, 0); }
+  80% { clip: rect(89px, 9999px, 32px, 0); }
+  100% { clip: rect(12px, 9999px, 58px, 0); }
+}
+
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  10% { transform: skew(-2deg); }
+  20% { transform: skew(2deg); }
+  30% { transform: skew(0deg); }
+  100% { transform: skew(0deg); }
+}
+
+/* Entrance animation for glitch */
+.glitch-wrapper {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Divider line */
+.divider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  margin: 10px 0;
+  animation: fadeIn 0.6s ease 0.3s both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+/* Message */
+.message {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(16px, 3vw, 24px);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: fadeInUp 0.6s ease 0.5s both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code hint */
+.code-hint {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+  margin-top: 8px;
+  animation: fadeInUp 0.6s ease 0.7s both;
+}
+
+/* Button */
+.back-btn {
+  margin-top: 40px;
+  padding: 16px 40px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease 0.9s both;
+}
+
+.back-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(120, 119, 198, 0.3), rgba(255, 119, 198, 0.2));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.back-btn:hover {
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(120, 119, 198, 0.3);
+}
+
+.back-btn:hover::before {
+  opacity: 1;
+}
+
+.back-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Floating particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: float 15s infinite;
+}
+
+.particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 2s; }
+.particle:nth-child(3) { left: 80%; top: 10%; animation-delay: 4s; }
+.particle:nth-child(4) { left: 90%; top: 70%; animation-delay: 6s; }
+.particle:nth-child(5) { left: 50%; top: 50%; animation-delay: 8s; }
+.particle:nth-child(6) { left: 30%; top: 30%; animation-delay: 10s; }
+.particle:nth-child(7) { left: 70%; top: 60%; animation-delay: 12s; }
+.particle:nth-child(8) { left: 15%; top: 45%; animation-delay: 14s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .glitch { font-size: 100px; }
+  .message { font-size: 14px; letter-spacing: 1px; }
+  .back-btn { padding: 14px 30px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="noise"></div>
+<div class="scanlines"></div>
+
+<div class="particles">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+</div>
+
+<div class="container">
+  <div class="glitch-wrapper">
+    <div class="glitch">404</div>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <p class="message">Мы не нашли эту страницу...</p>
+  <p class="code-hint">ERR_PAGE_NOT_FOUND</p>
+  
+  <a href="{{ url_for('index') }}" class="back-btn"><span>Вернуться на главную</span></a>
+</div>
+
+</body>
+</html>

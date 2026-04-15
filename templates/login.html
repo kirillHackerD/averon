@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Averon AI — {% if mode=='register' %}Создание аккаунта{% else %}Вход{% endif %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #12121a;
+  --panel: rgba(20,20,30,0.6);
+  --border: rgba(255,255,255,0.08);
+  --text: #fff;
+  --text2: #a0a0b0;
+  --accent: #1a1a2e;
+  --accent2: #2d2d44;
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.split {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── LEFT SIDE (Visual) ── */
+.left {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  overflow: hidden;
+}
+
+#particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.left-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 40px;
+}
+
+.brand {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tagline {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 60px;
+  max-width: 300px;
+}
+
+/* Live Username Preview */
+.preview-box {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.preview-label {
+  font-size: 12px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.username-display {
+  font-family: var(--mono);
+  font-size: 42px;
+  font-weight: 500;
+  color: var(--text);
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.username-display.empty {
+  color: var(--text2);
+  opacity: 0.3;
+}
+
+.username-display.empty::after {
+  content: '@username';
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 42px;
+  background: #0f0f1a;
+  margin-left: 4px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.glitch-active {
+  animation: glitch 0.3s ease;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.identity-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.identity-status.ready {
+  color: var(--success);
+  border-color: rgba(34,197,94,0.3);
+  background: rgba(34,197,94,0.05);
+}
+
+.identity-status.ready::before {
+  content: '✓';
+}
+
+.identity-status.taken {
+  color: var(--error);
+  border-color: rgba(239,68,68,0.3);
+  background: rgba(239,68,68,0.05);
+}
+
+.identity-status.taken::before {
+  content: '✕';
+}
+
+/* ── RIGHT SIDE (Form) ── */
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--bg);
+  position: relative;
+}
+
+.right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 10;
+}
+
+.form-header {
+  margin-bottom: 32px;
+}
+
+.form-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-header p {
+  font-size: 14px;
+  color: var(--text2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  position: relative;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font: 15px var(--font);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.field input:focus {
+  border-color: #383838;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.05), 0 0 20px rgba(255,255,255,0.03);
+  background: rgba(20,20,35,0.8);
+}
+
+.field input::placeholder {
+  color: rgba(160,160,176,0.4);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+}
+
+.strength-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.strength-fill.weak { width: 33%; background: var(--error); }
+.strength-fill.medium { width: 66%; background: var(--warning); }
+.strength-fill.strong { width: 100%; background: var(--success); }
+
+.strength-text {
+  font-size: 11px;
+  margin-top: 6px;
+  color: var(--text2);
+}
+
+.strength-text.weak { color: var(--error); }
+.strength-text.medium { color: var(--warning); }
+.strength-text.strong { color: var(--success); }
+
+.match-indicator {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.match-indicator.show {
+  opacity: 1;
+}
+
+.match-indicator.match {
+  background: rgba(34,197,94,0.2);
+  color: var(--success);
+}
+
+.match-indicator.mismatch {
+  background: rgba(239,68,68,0.2);
+  color: var(--error);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, #2a2a3a 0%, #1f1f2e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font: 15px var(--font);
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.btn-submit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+.btn-submit:hover::before {
+  left: 100%;
+}
+
+.form-footer {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text2);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.switch-link {
+  color: var(--text2);
+  font-size: 14px;
+}
+
+.switch-link a {
+  color: #a0a0b0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.switch-link a:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: var(--error);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .split { flex-direction: column; }
+  .left { min-height: 40vh; }
+  .left-content { padding: 24px; }
+  .brand { top: 24px; left: 24px; }
+  .username-display { font-size: 28px; }
+  .right { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="split">
+  <!-- LEFT: Visual -->
+  <div class="left">
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="brand">
+      <img src="{{ url_for('static', filename='logo.png') }}" class="brand-icon" alt="Averon">
+      <span>Averon | Comen Cloud</span>
+    </div>
+    
+    <div class="left-content">
+      <p class="tagline">{% if mode=='register' %}Создание аккаунта в Comen Cloud{% else %}Вход в сервис Comen Cloud{% endif %}</p>
+      
+      <div class="preview-box">
+        <span class="preview-label">Кто ты?</span>
+        <div class="username-display empty" id="usernamePreview">
+          <span class="typing-cursor"></span>
+        </div>
+        <div class="identity-status" id="identityStatus">Введите данные для начала</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- RIGHT: Form -->
+  <div class="right">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>{% if mode=='register' %}Создать аккаунт{% else %}Вход{% endif %}</h2>
+        <p>{% if mode=='register' %}Заполните форму для регистрации{% else %}Введите свои данные{% endif %}</p>
+      </div>
+      
+      {% if error %}
+      <div class="error-msg">{{ error }}</div>
+      {% endif %}
+      
+      {% if mode == 'register' %}
+      <form class="form" method="POST" action="/register" id="registerForm">
+        <div class="field">
+          <label>Никнейм</label>
+          <div class="input-wrap">
+            <input type="text" name="username" id="usernameInput" placeholder="@username" autocomplete="username" required>
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>Почта</label>
+          <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        
+        <div class="field">
+          <label>Пароль</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="passwordInput" placeholder="Минимум 8 символов" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('passwordInput', this)">👁</button>
+          </div>
+          <div class="strength-bar">
+            <div class="strength-fill" id="strengthFill"></div>
+          </div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+        
+        <div class="field">
+          <label>Повторите пароль</label>
+          <div class="input-wrap">
+            <input type="password" name="password2" id="password2Input" placeholder="Тот же пароль" required>
+            <div class="match-indicator" id="matchIndicator"></div>
+          </div>
+        </div>
+        
+        <button class="btn-submit" type="submit" id="submitBtn">Создать аккаунт</button>
+      </form>
+      
+      <div class="form-footer">
+        <div class="divider">или</div>
+        <p class="switch-link">Уже есть аккаунт? <a href="/login">Войти →</a></p>
+      </div>
+      
+      {% else %}
+      <form class="form" method="POST" action="/login">
+        <div class="field">
+          <label>Логин или Email</label>
+          <input type="text" name="login" placeholder="yourname" autocomplete="username" required>
+        </div>
+        
+        <div class="field">
+          <label>Пароль</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="passwordInput" placeholder="••••••••" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('passwordInput', this)">👁</button>
+          </div>
+        </div>
+        
+        <button class="btn-submit" type="submit">Продолжить</button>
+      </form>
+      
+      <div class="form-footer">
+        <div class="divider">или</div>
+        <p class="switch-link">Нет аккаунта? <a href="/register">Создать →</a></p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+// Particle Network Animation
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animationId;
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.5;
+    this.vy = (Math.random() - 0.5) * 0.5;
+    this.radius = Math.random() * 2 + 1;
+  }
+  
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fill();
+  }
+}
+
+function initParticles() {
+  particles = [];
+  const count = Math.min(50, Math.floor(canvas.width * canvas.height / 15000));
+  for (let i = 0; i < count; i++) {
+    particles.push(new Particle());
+  }
+}
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(255,255,255,${0.15 * (1 - dist / 150)})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  
+  drawConnections();
+  animationId = requestAnimationFrame(animateParticles);
+}
+
+resizeCanvas();
+initParticles();
+animateParticles();
+
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  initParticles();
+});
+
+// Username Live Preview with Availability Check
+const usernameInput = document.getElementById('usernameInput');
+const usernamePreview = document.getElementById('usernamePreview');
+const identityStatus = document.getElementById('identityStatus');
+
+if (usernameInput) {
+  let lastValue = '';
+  let checkTimeout = null;
+  
+  usernameInput.addEventListener('input', (e) => {
+    const value = e.target.value.trim();
+    
+    // Glitch effect
+    if (value !== lastValue) {
+      usernamePreview.classList.add('glitch-active');
+      setTimeout(() => usernamePreview.classList.remove('glitch-active'), 300);
+    }
+    lastValue = value;
+    
+    // Clear previous timeout
+    if (checkTimeout) clearTimeout(checkTimeout);
+    
+    // Update preview
+    if (value) {
+      usernamePreview.classList.remove('empty');
+      usernamePreview.innerHTML = '@' + value + '<span class="typing-cursor"></span>';
+      identityStatus.textContent = 'Проверка...';
+      identityStatus.classList.remove('ready', 'taken');
+      
+      // Debounced availability check
+      checkTimeout = setTimeout(() => {
+        checkUsernameAvailability(value);
+      }, 500);
+    } else {
+      usernamePreview.classList.add('empty');
+      usernamePreview.innerHTML = '<span class="typing-cursor"></span>';
+      identityStatus.textContent = 'Введите данные для начала';
+      identityStatus.classList.remove('ready', 'taken');
+    }
+  });
+  
+  async function checkUsernameAvailability(username) {
+    try {
+      const response = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+      const data = await response.json();
+      
+      if (data.available) {
+        identityStatus.textContent = '✓ Никнейм свободен';
+        identityStatus.classList.add('ready');
+        identityStatus.classList.remove('taken');
+      } else {
+        identityStatus.textContent = '✕ Никнейм занят';
+        identityStatus.classList.add('taken');
+        identityStatus.classList.remove('ready');
+      }
+    } catch (err) {
+      identityStatus.textContent = 'Ошибка проверки';
+      identityStatus.classList.remove('ready', 'taken');
+    }
+  }
+}
+
+// Password Strength
+const passwordInput = document.getElementById('passwordInput');
+const strengthFill = document.getElementById('strengthFill');
+const strengthText = document.getElementById('strengthText');
+
+if (passwordInput) {
+  passwordInput.addEventListener('input', (e) => {
+    const value = e.target.value;
+    let strength = 0;
+    
+    if (value.length >= 8) strength++;
+    if (value.match(/[a-z]/) && value.match(/[A-Z]/)) strength++;
+    if (value.match(/[0-9]/)) strength++;
+    if (value.match(/[^a-zA-Z0-9]/)) strength++;
+    
+    strengthFill.className = 'strength-fill';
+    strengthText.className = 'strength-text';
+    
+    if (value.length === 0) {
+      strengthText.textContent = '';
+    } else if (strength <= 1) {
+      strengthFill.classList.add('weak');
+      strengthText.classList.add('weak');
+      strengthText.textContent = 'Слабый пароль';
+    } else if (strength === 2) {
+      strengthFill.classList.add('medium');
+      strengthText.classList.add('medium');
+      strengthText.textContent = 'Средний пароль';
+    } else {
+      strengthFill.classList.add('strong');
+      strengthText.classList.add('strong');
+      strengthText.textContent = 'Надёжный пароль';
+    }
+  });
+}
+
+// Password Match
+const password2Input = document.getElementById('password2Input');
+const matchIndicator = document.getElementById('matchIndicator');
+
+if (password2Input && passwordInput) {
+  password2Input.addEventListener('input', (e) => {
+    const value = e.target.value;
+    const original = passwordInput.value;
+    
+    matchIndicator.classList.add('show');
+    
+    if (value === original && value !== '') {
+      matchIndicator.classList.add('match');
+      matchIndicator.classList.remove('mismatch');
+      matchIndicator.textContent = '✓';
+    } else if (value !== '') {
+      matchIndicator.classList.add('mismatch');
+      matchIndicator.classList.remove('match');
+      matchIndicator.textContent = '✕';
+    } else {
+      matchIndicator.classList.remove('show', 'match', 'mismatch');
+    }
+  });
+}
+
+// Password Toggle
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+</script>
+
+</body>
+</html>

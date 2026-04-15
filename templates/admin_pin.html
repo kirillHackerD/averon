@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ввод пинкода - Админ панель</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+</head>
+<body>
+    <div class="pin-container">
+        <div class="pin-card">
+            <h1>Админ панель</h1>
+            <p class="pin-subtitle">Введите пинкод для доступа</p>
+            
+            <div class="pin-input-group">
+                <input
+                    type="password"
+                    id="pinInput"
+                    class="pin-input"
+                    maxlength="16"
+                    placeholder="••••"
+                    autocomplete="off"
+                >
+                <button id="submitPin" class="btn-primary">Войти</button>
+            </div>
+            
+            <div id="error" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        const pinInput = document.getElementById('pinInput');
+        const submitBtn = document.getElementById('submitPin');
+        const errorDiv = document.getElementById('error');
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        async function submitPin() {
+            const pin = pinInput.value.trim();
+            if (!pin) {
+                showError('Введите пинкод');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Проверка...';
+
+            try {
+                const response = await fetch('/admin/pin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pin })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = '/admin';
+                } else {
+                    showError(data.error || 'Неверный пинкод');
+                    pinInput.value = '';
+                    pinInput.focus();
+                }
+            } catch (e) {
+                showError('Ошибка при проверке пинкода');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Войти';
+            }
+        }
+
+        submitBtn.addEventListener('click', submitPin);
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitPin();
+            }
+        });
+
+        pinInput.focus();
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .pin-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .pin-card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pin-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .pin-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 8px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .pin-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        .pin-input::placeholder {
+            letter-spacing: 4px;
+        }
+
+        .btn-primary {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            border: none;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            display: none;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #fca5a5;
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html>

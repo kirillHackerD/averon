@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чаты пользователя - {{ user.username }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div>
+                <a href="/admin" class="back-link">← Назад к пользователям</a>
+                <h1>Чаты пользователя: {{ user.username }}</h1>
+                <p class="user-email">{{ user.email }}</p>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <h2>Чаты ({{ total_chats }})</h2>
+            {% if chats %}
+            <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Модель</th>
+                        <th>Создан</th>
+                        <th>Обновлён</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chat in chats %}
+                    <tr data-chat-id="{{ chat.id }}">
+                        <td>{{ chat.id }}</td>
+                        <td>{{ chat.title or 'Без названия' }}</td>
+                        <td>{{ chat.model }}</td>
+                        <td>{{ chat.created_at }}</td>
+                        <td>{{ chat.updated_at }}</td>
+                        <td>
+                            <button class="btn-primary view-messages" data-user-id="{{ user.id }}" data-chat-id="{{ chat.id }}">Сообщения</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="/admin/user/{{ user.id }}?page={{ page - 1 }}" class="pagination-btn">← Назад</a>
+                {% endif %}
+
+                <span class="pagination-info">Страница {{ page }} из {{ total_pages }}</span>
+
+                {% if page < total_pages %}
+                <a href="/admin/user/{{ user.id }}?page={{ page + 1 }}" class="pagination-btn">Вперёд →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <p class="no-data">У пользователя нет чатов</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.view-messages').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const userId = btn.dataset.userId;
+                const chatId = btn.dataset.chatId;
+                window.location.href = `/admin/user/${userId}/chat/${chatId}`;
+            });
+        });
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100%;
+        }
+
+        html, body {
+            height: auto;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            padding-bottom: 100px;
+        }
+
+        .admin-header {
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-bottom: 16px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #60a5fa;
+        }
+
+        .admin-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .user-email {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .admin-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .admin-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .admin-table thead {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-table th {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .admin-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-primary {
+            padding: 8px 16px;
+            background: #60a5fa;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #3b82f6;
+        }
+
+        .no-data {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .pagination-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pagination-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html>

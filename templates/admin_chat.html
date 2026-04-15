@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сообщения чата - {{ chat.title or 'Без названия' }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div>
+                <a href="/admin/user/{{ user.id }}" class="back-link">← Назад к чатам</a>
+                <h1>Чат: {{ chat.title or 'Без названия' }}</h1>
+                <p class="chat-info">Пользователь: {{ user.username }} | Модель: {{ chat.model }}</p>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <h2>Сообщения ({{ total_messages }})</h2>
+            {% if messages %}
+            <div class="messages-container">
+                {% for msg in messages %}
+                <div class="message-item message-{{ msg.role }}">
+                    <div class="message-header">
+                        <span class="message-role">{{ msg.role }}</span>
+                        <span class="message-time">{{ msg.created_at }}</span>
+                    </div>
+                    <div class="message-content">{{ msg.content }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="/admin/user/{{ user.id }}/chat/{{ chat.id }}?page={{ page - 1 }}" class="pagination-btn">← Назад</a>
+                {% endif %}
+
+                <span class="pagination-info">Страница {{ page }} из {{ total_pages }}</span>
+
+                {% if page < total_pages %}
+                <a href="/admin/user/{{ user.id }}/chat/{{ chat.id }}?page={{ page + 1 }}" class="pagination-btn">Вперёд →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <p class="no-data">В чате нет сообщений</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100%;
+        }
+
+        html, body {
+            height: auto;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            padding-bottom: 100px;
+        }
+
+        .admin-header {
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-bottom: 16px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #60a5fa;
+        }
+
+        .admin-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .chat-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .admin-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .messages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .message-user {
+            border-left: 4px solid #60a5fa;
+        }
+
+        .message-assistant {
+            border-left: 4px solid #10b981;
+        }
+
+        .message-system {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .message-role {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .message-user .message-role {
+            color: #60a5fa;
+        }
+
+        .message-assistant .message-role {
+            color: #10b981;
+        }
+
+        .message-system .message-role {
+            color: #f59e0b;
+        }
+
+        .message-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        .message-content {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .no-data {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .pagination-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .pagination-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pagination-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html>

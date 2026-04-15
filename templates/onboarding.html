@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Averon AI · Знакомство</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #212121;
+  --bg2:     #2a2a2a;
+  --bg3:     #333333;
+  --bg4:     #3a3a3a;
+  --border:  #383838;
+  --border2: #444444;
+  --text:    #ececec;
+  --text2:   #b4b4b4;
+  --text3:   #757575;
+  --accent:  #cc785c;
+  --accent-dim: rgba(204,120,92,0.15);
+  --font:    'Inter', -apple-system, sans-serif;
+  --radius:  12px;
+  --ease:    cubic-bezier(0.4,0,0.2,1);
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── SVG background ── */
+.ob-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ── */
+.ob-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* ── Card ── */
+.ob-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  animation: fadeUp 0.4s var(--ease) both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Progress bar ── */
+.ob-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 32px;
+}
+.ob-progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bg4);
+  transition: background 0.3s var(--ease);
+}
+.ob-progress-dot.done  { background: var(--accent); }
+.ob-progress-dot.active { background: var(--accent); opacity: 0.5; }
+
+/* ── Step ── */
+.ob-step {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  animation: stepIn 0.25s var(--ease) both;
+}
+.ob-step.active { display: flex; }
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Logo / heading ── */
+.ob-logo {
+  font-size: 22px;
+  color: var(--accent);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ob-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.ob-sub {
+  font-size: 14px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* ── Fields ── */
+.ob-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ob-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+}
+.ob-input, .ob-textarea, .ob-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.ob-input:focus, .ob-textarea:focus, .ob-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(204,120,92,0.12);
+}
+.ob-input::placeholder, .ob-textarea::placeholder { color: var(--text3); }
+.ob-textarea { resize: none; min-height: 90px; line-height: 1.55; }
+.ob-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  transition: all .2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+.ob-select:hover {
+  border-color: var(--border2);
+  background: var(--bg4);
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  transform: translateY(-1px);
+}
+.ob-select option { background: var(--bg3); }
+
+/* ── Chip grid ── */
+.ob-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ob-chip {
+  padding: 7px 14px;
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  background: var(--bg3);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+  user-select: none;
+}
+.ob-chip:hover { border-color: var(--text3); color: var(--text); }
+.ob-chip.sel   { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+
+/* ── Buttons ── */
+.ob-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.ob-btn-next {
+  flex: 1;
+  padding: 12px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  letter-spacing: -0.01em;
+}
+.ob-btn-next:hover { opacity: 0.88; }
+.ob-btn-next:disabled { opacity: 0.45; cursor: not-allowed; }
+.ob-btn-back {
+  padding: 12px 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ob-btn-back:hover { background: var(--bg4); }
+.ob-btn-skip {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 0;
+  margin-top: -6px;
+  align-self: center;
+}
+.ob-btn-skip:hover { color: var(--text2); }
+
+/* ── Avatar picker ── */
+.ob-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ob-avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+/* ── Final screen ── */
+.ob-done {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  animation: stepIn 0.3s var(--ease) both;
+}
+.ob-done.active { display: flex; }
+.ob-done-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.ob-done-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.ob-done-sub   { font-size: 14px; color: var(--text3); max-width: 340px; }
+</style>
+</head>
+<body>
+
+<!-- ── Animated SVG background ── -->
+<svg class="ob-bg" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Radial gradient for glow center -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#cc785c" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#cc785c" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Node glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background gradient blob -->
+  <ellipse cx="720" cy="450" rx="600" ry="400" fill="url(#centerGlow)"/>
+
+  <!-- Grid lines — subtle -->
+  <g stroke="#383838" stroke-width="1" opacity="0.5">
+    <!-- Vertical lines -->
+    <line x1="180" y1="0" x2="180" y2="900"/>
+    <line x1="360" y1="0" x2="360" y2="900"/>
+    <line x1="540" y1="0" x2="540" y2="900"/>
+    <line x1="720" y1="0" x2="720" y2="900"/>
+    <line x1="900" y1="0" x2="900" y2="900"/>
+    <line x1="1080" y1="0" x2="1080" y2="900"/>
+    <line x1="1260" y1="0" x2="1260" y2="900"/>
+    <!-- Horizontal lines -->
+    <line x1="0" y1="150" x2="1440" y2="150"/>
+    <line x1="0" y1="300" x2="1440" y2="300"/>
+    <line x1="0" y1="450" x2="1440" y2="450"/>
+    <line x1="0" y1="600" x2="1440" y2="600"/>
+    <line x1="0" y1="750" x2="1440" y2="750"/>
+  </g>
+
+  <!-- Connection lines between nodes (accent color, low opacity) -->
+  <g stroke="#cc785c" stroke-width="1" opacity="0.18" fill="none">
+    <line x1="180" y1="150" x2="360" y2="300"/>
+    <line x1="360" y1="300" x2="540" y2="150"/>
+    <line x1="540" y1="150" x2="720" y2="300"/>
+    <line x1="720" y1="300" x2="900" y2="150"/>
+    <line x1="900" y1="150" x2="1080" y2="300"/>
+    <line x1="1080" y1="300" x2="1260" y2="150"/>
+    <line x1="180" y1="450" x2="540" y2="300"/>
+    <line x1="540" y1="300" x2="900" y2="450"/>
+    <line x1="900" y1="450" x2="1260" y2="300"/>
+    <line x1="360" y1="600" x2="720" y2="450"/>
+    <line x1="720" y1="450" x2="1080" y2="600"/>
+    <line x1="180" y1="750" x2="540" y2="600"/>
+    <line x1="540" y1="600" x2="900" y2="750"/>
+    <line x1="900" y1="750" x2="1260" y2="600"/>
+    <line x1="360" y1="150" x2="180" y2="300"/>
+    <line x1="1260" y1="450" x2="1080" y2="600"/>
+  </g>
+
+  <!-- Nodes at grid intersections -->
+  <g filter="url(#glow)">
+    <!-- Row 1 (y=150) -->
+    <circle cx="180"  cy="150" r="2.5" fill="#cc785c" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3.2s" repeatCount="indefinite"/></circle>
+    <circle cx="360"  cy="150" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="4.1s" repeatCount="indefinite"/></circle>
+    <circle cx="540"  cy="150" r="3"   fill="#cc785c" opacity="0.6"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="720"  cy="150" r="2"   fill="#cc785c" opacity="0.35"><animate attributeName="opacity" values="0.35;0.9;0.35" dur="5s" repeatCount="indefinite"/></circle>
+    <circle cx="900"  cy="150" r="3.5" fill="#cc785c" opacity="0.55"><animate attributeName="opacity" values="0.55;1;0.55" dur="3.7s" repeatCount="indefinite"/></circle>
+    <circle cx="1080" cy="150" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="4.4s" repeatCount="indefinite"/></circle>
+    <circle cx="1260" cy="150" r="2.5" fill="#cc785c" opacity="0.45"><animate attributeName="opacity" values="0.45;0.9;0.45" dur="3s" repeatCount="indefinite"/></circle>
+    <!-- Row 2 (y=300) -->
+    <circle cx="180"  cy="300" r="2"   fill="#cc785c" opacity="0.4"><animate attributeName="opacity" values="0.4;0.85;0.4" dur="4.6s" repeatCount="indefinite"/></circle>
+    <circle cx="360"  cy="300" r="3"   fill="#cc785c" opacity="0.6"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/></circle>
+    <circle cx="540"  cy="300" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.75;0.3" dur="5.2s" repeatCount="indefinite"/></circle>
+    <circle cx="900"  cy="300" r="2.5" fill="#cc785c" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3.3s" repeatCount="indefinite"/></circle>
+    <circle cx="1080" cy="300" r="3"   fill="#cc785c" opacity="0.55"><animate attributeName="opacity" values="0.55;1;0.55" dur="2.9s" repeatCount="indefinite"/></circle>
+    <circle cx="1260" cy="300" r="2"   fill="#cc785c" opacity="0.35"><animate attributeName="opacity" values="0.35;0.8;0.35" dur="4.8s" repeatCount="indefinite"/></circle>
+    <!-- Row 3 (y=450) — center row, brighter -->
+    <circle cx="180"  cy="450" r="3"   fill="#cc785c" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="360"  cy="450" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="4s" repeatCount="indefinite"/></circle>
+    <circle cx="540"  cy="450" r="4"   fill="#cc785c" opacity="0.7"><animate attributeName="opacity" values="0.7;1;0.7" dur="2.2s" repeatCount="indefinite"/></circle>
+    <circle cx="900"  cy="450" r="4"   fill="#cc785c" opacity="0.65"><animate attributeName="opacity" values="0.65;1;0.65" dur="2.6s" repeatCount="indefinite"/></circle>
+    <circle cx="1080" cy="450" r="2"   fill="#cc785c" opacity="0.35"><animate attributeName="opacity" values="0.35;0.8;0.35" dur="4.3s" repeatCount="indefinite"/></circle>
+    <circle cx="1260" cy="450" r="3"   fill="#cc785c" opacity="0.5"><animate attributeName="opacity" values="0.5;0.9;0.5" dur="3.1s" repeatCount="indefinite"/></circle>
+    <!-- Row 4 (y=600) -->
+    <circle cx="180"  cy="600" r="2.5" fill="#cc785c" opacity="0.4"><animate attributeName="opacity" values="0.4;0.85;0.4" dur="4.7s" repeatCount="indefinite"/></circle>
+    <circle cx="360"  cy="600" r="3"   fill="#cc785c" opacity="0.55"><animate attributeName="opacity" values="0.55;1;0.55" dur="3.4s" repeatCount="indefinite"/></circle>
+    <circle cx="540"  cy="600" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="5.5s" repeatCount="indefinite"/></circle>
+    <circle cx="900"  cy="600" r="2.5" fill="#cc785c" opacity="0.45"><animate attributeName="opacity" values="0.45;0.9;0.45" dur="3.8s" repeatCount="indefinite"/></circle>
+    <circle cx="1080" cy="600" r="3"   fill="#cc785c" opacity="0.6"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.7s" repeatCount="indefinite"/></circle>
+    <circle cx="1260" cy="600" r="2"   fill="#cc785c" opacity="0.35"><animate attributeName="opacity" values="0.35;0.75;0.35" dur="4.2s" repeatCount="indefinite"/></circle>
+    <!-- Row 5 (y=750) -->
+    <circle cx="180"  cy="750" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="4.9s" repeatCount="indefinite"/></circle>
+    <circle cx="540"  cy="750" r="3"   fill="#cc785c" opacity="0.5"><animate attributeName="opacity" values="0.5;0.95;0.5" dur="3.6s" repeatCount="indefinite"/></circle>
+    <circle cx="900"  cy="750" r="2.5" fill="#cc785c" opacity="0.4"><animate attributeName="opacity" values="0.4;0.85;0.4" dur="2.4s" repeatCount="indefinite"/></circle>
+    <circle cx="1260" cy="750" r="2"   fill="#cc785c" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="5.1s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- Floating pulse rings (large soft glows) -->
+  <g filter="url(#softglow)" opacity="0.4">
+    <circle cx="1300" cy="120" r="60" fill="none" stroke="#cc785c" stroke-width="1">
+      <animate attributeName="r" values="60;85;60" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="140" cy="780" r="50" fill="none" stroke="#cc785c" stroke-width="1">
+      <animate attributeName="r" values="50;75;50" dur="7.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.35;0.08;0.35" dur="7.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1350" cy="750" r="40" fill="none" stroke="#cc785c" stroke-width="1">
+      <animate attributeName="r" values="40;65;40" dur="5.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.07;0.3" dur="5.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Travelling signal dot along a path -->
+  <circle r="3" fill="#cc785c" opacity="0.8" filter="url(#glow)">
+    <animateMotion dur="8s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#signalPath"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.9;0.9;0" dur="8s" repeatCount="indefinite"/>
+  </circle>
+  <path id="signalPath" d="M180,150 L360,300 L540,150 L720,300 L900,150 L1080,300 L1260,150" fill="none"/>
+
+  <!-- Second travelling signal -->
+  <circle r="2.5" fill="#cc785c" opacity="0.7" filter="url(#glow)">
+    <animateMotion dur="10s" repeatCount="indefinite" rotate="auto" begin="3s">
+      <mpath href="#signalPath2"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="0;0.8;0.8;0" dur="10s" repeatCount="indefinite" begin="3s"/>
+  </circle>
+  <path id="signalPath2" d="M180,750 L540,600 L900,750 L1260,600" fill="none"/>
+
+  <!-- Scanline overlay (very subtle) -->
+  <rect width="1440" height="900" fill="url(#scanlines)" opacity="0.03"/>
+</svg>
+
+<div class="ob-wrap">
+  <div class="ob-card" id="obCard">
+
+    <!-- Progress dots -->
+    <div class="ob-progress" id="obProgress">
+      <div class="ob-progress-dot active" id="dot0"></div>
+      <div class="ob-progress-dot" id="dot1"></div>
+      <div class="ob-progress-dot" id="dot2"></div>
+      <div class="ob-progress-dot" id="dot3"></div>
+    </div>
+
+    <!-- ── Step 0: Welcome ── -->
+    <div class="ob-step active" id="step0">
+      <div>
+        <div class="ob-logo">✳ Averon AI</div>
+        <div class="ob-title">Привет, {{ username }}! 👋</div>
+        <div class="ob-sub">Пару вопросов — и я буду подстраиваться именно под тебя. Займёт меньше минуты.</div>
+      </div>
+
+      <div class="ob-field">
+        <div class="ob-label">Как тебя называть?</div>
+        <input class="ob-input" id="f_name" type="text" placeholder="Имя или никнейм"
+               value="{{ username }}" maxlength="40">
+      </div>
+
+      <div class="ob-field">
+        <div class="ob-label">Сколько лет?</div>
+        <select class="ob-select" id="f_age">
+          <option value="">— не указывать —</option>
+          <option>до 16</option>
+          <option>16–18</option>
+          <option>18–24</option>
+          <option>25–34</option>
+          <option>35–44</option>
+          <option>45+</option>
+        </select>
+      </div>
+
+      <div class="ob-actions">
+        <button class="ob-btn-next" onclick="nextStep()">Продолжить →</button>
+      </div>
+      <button class="ob-btn-skip" onclick="skipOnboarding()">Пропустить настройку</button>
+    </div>
+
+    <!-- ── Step 1: Occupation ── -->
+    <div class="ob-step" id="step1">
+      <div>
+        <div class="ob-title">Чем занимаешься?</div>
+        <div class="ob-sub">Выбери всё подходящее — или напиши своё.</div>
+      </div>
+
+      <div class="ob-chips" id="occupationChips">
+        <div class="ob-chip" data-v="разработчик">💻 Разработчик</div>
+        <div class="ob-chip" data-v="дизайнер">🎨 Дизайнер</div>
+        <div class="ob-chip" data-v="студент">🎓 Студент</div>
+        <div class="ob-chip" data-v="хакер / пентестер">🔐 Хакер / пентестер</div>
+        <div class="ob-chip" data-v="геймер">🎮 Геймер</div>
+        <div class="ob-chip" data-v="предприниматель">💼 Предприниматель</div>
+        <div class="ob-chip" data-v="аналитик / data science">📊 Аналитик / DS</div>
+        <div class="ob-chip" data-v="системный администратор">🖥 Сисадмин</div>
+        <div class="ob-chip" data-v="контент-мейкер">📱 Контент-мейкер</div>
+        <div class="ob-chip" data-v="фрилансер">🌐 Фрилансер</div>
+      </div>
+
+      <div class="ob-field">
+        <div class="ob-label">Или напиши сам (необязательно)</div>
+        <input class="ob-input" id="f_occ_custom" type="text" placeholder="Например: DevOps, маркетолог…" maxlength="80">
+      </div>
+
+      <div class="ob-actions">
+        <button class="ob-btn-back" onclick="prevStep()">←</button>
+        <button class="ob-btn-next" onclick="nextStep()">Продолжить →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Goals & Interests ── -->
+    <div class="ob-step" id="step2">
+      <div>
+        <div class="ob-title">Что тебя интересует?</div>
+        <div class="ob-sub">Под что подстраивать ответы?</div>
+      </div>
+
+      <div class="ob-chips" id="interestChips">
+        <div class="ob-chip" data-v="программирование">⚙️ Программирование</div>
+        <div class="ob-chip" data-v="кибербезопасность">🛡 Кибербезопасность</div>
+        <div class="ob-chip" data-v="ИИ и машинное обучение">🤖 ИИ / ML</div>
+        <div class="ob-chip" data-v="игры">🎮 Игры</div>
+        <div class="ob-chip" data-v="наука и технологии">🔬 Наука</div>
+        <div class="ob-chip" data-v="бизнес и стартапы">💡 Бизнес / стартапы</div>
+        <div class="ob-chip" data-v="творчество и арт">🎭 Творчество / арт</div>
+        <div class="ob-chip" data-v="музыка">🎵 Музыка</div>
+        <div class="ob-chip" data-v="спорт и здоровье">💪 Спорт / здоровье</div>
+        <div class="ob-chip" data-v="история и культура">📚 История / культура</div>
+        <div class="ob-chip" data-v="путешествия">✈️ Путешествия</div>
+        <div class="ob-chip" data-v="финансы и инвестиции">📈 Финансы</div>
+      </div>
+
+      <div class="ob-actions">
+        <button class="ob-btn-back" onclick="prevStep()">←</button>
+        <button class="ob-btn-next" onclick="nextStep()">Продолжить →</button>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Style ── -->
+    <div class="ob-step" id="step3">
+      <div>
+        <div class="ob-title">Как общаться?</div>
+        <div class="ob-sub">Выбери стиль ответов.</div>
+      </div>
+
+      <div class="ob-chips" id="toneChips" style="flex-direction:column; gap:10px;">
+        <div class="ob-chip sel" data-v="casual" style="border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:18px">😎</span>
+          <div><div style="font-weight:600;color:var(--text)">По-братски</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Просто, по делу, без воды</div></div>
+        </div>
+        <div class="ob-chip" data-v="professional" style="border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:18px">💼</span>
+          <div><div style="font-weight:600;color:var(--text)">Профессионально</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Чётко, структурированно</div></div>
+        </div>
+        <div class="ob-chip" data-v="concise" style="border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <span style="font-size:18px">⚡</span>
+          <div><div style="font-weight:600;color:var(--text)">Кратко</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Минимум слов, максимум сути</div></div>
+        </div>
+      </div>
+
+      <div class="ob-field" style="margin-top:6px">
+        <div class="ob-label">Что-то ещё хочешь сказать о себе?</div>
+        <textarea class="ob-textarea" id="f_about" placeholder="Любая информация которую ИИ должна о тебе знать…" maxlength="400"></textarea>
+      </div>
+
+      <div class="ob-actions">
+        <button class="ob-btn-back" onclick="prevStep()">←</button>
+        <button class="ob-btn-next" onclick="finish()" id="finishBtn">Готово ✓</button>
+      </div>
+    </div>
+
+    <!-- ── Done ── -->
+    <div class="ob-done" id="stepDone">
+      <div class="ob-done-icon">✳</div>
+      <div class="ob-done-title">Всё готово!</div>
+      <div class="ob-done-sub">Averon теперь знает о тебе достаточно. Начнём?</div>
+      <button class="ob-btn-next" style="width:100%;margin-top:8px" onclick="location.href='/'">Открыть Averon AI →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let step = 0;
+const STEPS = 4;
+
+function updateProgress() {
+  for (let i = 0; i < STEPS; i++) {
+    const dot = document.getElementById('dot' + i);
+    if (!dot) continue;
+    dot.className = 'ob-progress-dot' + (i < step ? ' done' : i === step ? ' active' : '');
+  }
+}
+
+function showStep(n) {
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('step' + n);
+  if (el) {
+    // Re-trigger animation
+    el.style.animation = 'none';
+    requestAnimationFrame(() => {
+      el.style.animation = '';
+      el.classList.add('active');
+    });
+  }
+  updateProgress();
+}
+
+function nextStep() {
+  if (step < STEPS - 1) {
+    step++;
+    showStep(step);
+  }
+}
+function prevStep() {
+  if (step > 0) {
+    step--;
+    showStep(step);
+  }
+}
+
+// Chip toggle — single select for tone, multi for others
+document.getElementById('toneChips').querySelectorAll('.ob-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('toneChips').querySelectorAll('.ob-chip').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+  });
+});
+['occupationChips', 'interestChips'].forEach(id => {
+  document.getElementById(id).querySelectorAll('.ob-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('sel'));
+  });
+});
+
+// Update avatar preview
+document.getElementById('f_name').addEventListener('input', e => {
+  const v = e.target.value.trim();
+});
+
+function getSelected(containerId) {
+  return [...document.querySelectorAll(`#${containerId} .ob-chip.sel`)]
+    .map(c => c.dataset.v).filter(Boolean);
+}
+
+async function finish() {
+  const btn = document.getElementById('finishBtn');
+  btn.textContent = 'Сохраняю…';
+  btn.disabled = true;
+
+  const name       = document.getElementById('f_name').value.trim();
+  const age        = document.getElementById('f_age').value;
+  const occChips   = getSelected('occupationChips');
+  const occCustom  = document.getElementById('f_occ_custom').value.trim();
+  const interests  = getSelected('interestChips');
+  const tone       = getSelected('toneChips')[0] || 'casual';
+  const about      = document.getElementById('f_about').value.trim();
+
+  // Build occupation string
+  const occParts = [...occChips];
+  if (occCustom) occParts.push(occCustom);
+  const occupation = occParts.join(', ');
+
+  // Build memory facts
+  const facts = [];
+  if (name)       facts.push(`Пользователя зовут ${name}`);
+  if (age)        facts.push(`Возраст: ${age}`);
+  if (occupation) facts.push(`Чем занимается: ${occupation}`);
+  if (interests.length) facts.push(`Интересы: ${interests.join(', ')}`);
+  if (about)      facts.push(about);
+
+  try {
+    // 1. Save settings (name, role, tone)
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_name:   name || '',
+        user_role:   occupation || '',
+        tone:        tone,
+        memory_enabled: 'true',
+        default_model: 'flash',
+        onboarded: 'true'
+      })
+    });
+
+    // 2. Save each fact to memory
+    for (const fact of facts) {
+      await fetch('/api/memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: fact })
+      });
+    }
+
+    // Show done screen
+    document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('obProgress').style.display = 'none';
+    document.getElementById('stepDone').classList.add('active');
+
+  } catch(e) {
+    btn.textContent = 'Ошибка, попробуй ещё';
+    btn.disabled = false;
+  }
+}
+
+async function skipOnboarding() {
+  // Mark as onboarded so we don't show again
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ onboarded: 'true' })
+  }).catch(() => {});
+  location.href = '/';
+}
+</script>
+</body>
+</html>
