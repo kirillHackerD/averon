@@ -6126,9 +6126,6 @@ def api_run_code():
     return jsonify(result)
 
 
+# Это оставляем (если нужно инициализировать базу при старте)
 if __name__ == "__main__":
     init_db()
-    # Debug mode disabled in production for security
-    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
-    # HTTP mode (no SSL)
-    app.run(debug=debug_mode, host="0.0.0.0", port=int(os.environ.get("PORT", 5870)))
